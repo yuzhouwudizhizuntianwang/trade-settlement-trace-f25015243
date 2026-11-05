@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><title>贸易服务结算与费用追溯 · 需求规格与验收标准</title>
+<style>
+@page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 10.5pt;
+       line-height: 1.7; color: #1c2b3a; }
+h1 { font-size: 20pt; color: #0b2a4a; border-bottom: 2px solid #1a5fa8;
+     padding-bottom: 6pt; margin: 0 0 14pt 0; }
+h2 { font-size: 14pt; color: #12467d; margin: 20pt 0 8pt 0; }
+h3 { font-size: 12pt; color: #1a5fa8; margin: 14pt 0 6pt 0; }
+h4 { font-size: 11pt; color: #12467d; margin: 12pt 0 4pt 0; }
+p { margin: 0 0 6pt 0; text-align: justify; }
+ul, ol { margin: 4pt 0 8pt 0; padding-left: 18pt; }
+li { margin: 2pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt 0; font-size: 9pt; }
+th { background: #e3eefb; color: #0b2a4a; border: 1px solid #9db8d4; padding: 4pt 6pt;
+     text-align: left; font-weight: bold; }
+td { border: 1px solid #b9cde3; padding: 4pt 6pt; vertical-align: top; }
+blockquote { margin: 6pt 0; padding: 4pt 10pt; border-left: 3px solid #2478d7;
+             background: #f2f7fd; color: #33475c; }
+pre { background: #f4f6f8; border: 1px solid #d8e4f0; padding: 8pt 10pt;
+      font-family: Consolas, "Courier New", monospace; font-size: 8pt; line-height: 1.35;
+      white-space: pre; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; color: #12467d; }
+hr { border: 0; border-top: 1px solid #d8e4f0; margin: 12pt 0; }
+.cover-meta { font-size: 9pt; color: #44586d; }
+</style></head>
+<body><h1>需求规格与追溯矩阵（REQ-01 ~ REQ-10）</h1>
+<table>
+<tr><th>提交信息</th><th>内容</th></tr>
+<tr><td>班级</td><td>f250118</td></tr>
+<tr><td>学号</td><td>f25015243</td></tr>
+<tr><td>姓名</td><td>姚晔</td></tr>
+<tr><td>项目名称</td><td>贸易服务结算与费用追溯（TST）</td></tr>
+<tr><td>所属阶段</td><td>Stage 03 需求定义 · 任务 2 编写需求与边界</td></tr>
+<tr><td>文档版本</td><td>v1.0</td></tr>
+<tr><td>提交日期</td><td>2026-11-05</td></tr>
+</table>
+<p><strong>填写提纲</strong>：REQ 编号 → 角色、场景和任务 → 输入和输出 → 授权及排除范围 → 异常处理 → 证据编号和业务负责人 <strong>规则</strong>：每条需求必须能回答"谁、在什么情境、完成什么任务、依据哪条证据、怎么算通过"。证据栏只填已采集编号。</p>
+<hr/>
+<h2>一、需求总览</h2>
+<table>
+<tr><th>编号</th><th>需求名称</th><th>优先级</th><th>对应问题</th><th>主张角色</th><th>业务负责人</th><th>主要证据</th></tr>
+<tr><td>REQ-01</td><td>单票费用全景归集</td><td>P0</td><td>P-07</td><td>陈莉莉</td><td>赵磊</td><td>E-010、E-018</td></tr>
+<tr><td>REQ-02</td><td>费率卡版本与生效期校验</td><td>P0</td><td>P-02</td><td>张伟</td><td>周慧</td><td>E-007、E-014</td></tr>
+<tr><td>REQ-03</td><td>供应商账单解析与逐行比对</td><td>P0</td><td>P-03</td><td>张伟</td><td>刘建国</td><td>E-005、E-009</td></tr>
+<tr><td>REQ-04</td><td>漏收与重复收费识别（开票前阻断）</td><td>P0</td><td>P-01、P-06</td><td>陈莉莉</td><td>周慧</td><td>E-001、E-008</td></tr>
+<tr><td>REQ-05</td><td>费用追溯链（单据→条款→承担方→凭证）</td><td>P0</td><td>P-05</td><td>陈莉莉</td><td>许安</td><td>E-002、E-010</td></tr>
+<tr><td>REQ-06</td><td>差异归因与责任人指派</td><td>P1</td><td>P-03、P-07</td><td>陈莉莉</td><td>赵磊</td><td>E-010、E-016</td></tr>
+<tr><td>REQ-07</td><td>异常与人工控制点（双人复核、阈值阻断）</td><td>P0</td><td>P-04</td><td>赵磊</td><td>许安</td><td>E-012、E-023</td></tr>
+<tr><td>REQ-08</td><td>审计日志与指标看板</td><td>P1</td><td>P-08</td><td>周慧</td><td>周慧</td><td>E-011、E-013</td></tr>
+<tr><td>REQ-09</td><td>数据边界与权限（脱敏、隔离、留痕）</td><td>P0</td><td>合规红线</td><td>许安</td><td>许安</td><td>E-021、E-023</td></tr>
+<tr><td>REQ-10</td><td>单票追溯包导出（客户答疑用）</td><td>P1</td><td>P-08</td><td>李文静</td><td>赵磊</td><td>E-011、E-025</td></tr>
+</table>
+<p><strong>优先级定义</strong>：P0 = 不做则目标不可达或触碰红线；P1 = 影响体验与效率，可在试点后迭代。</p>
+<hr/>
+<h2>二、需求详述</h2>
+<h3>REQ-01 单票费用全景归集（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>结算专员在出账前打开一票，需要看到这票的<strong>全部</strong>应收与应付费用行，而不是一个金额合计</td></tr>
+<tr><td>任务</td><td>按 订单号 / 订舱号 / 提单号 / 箱号 四个键把费用行归集到单票，标注来源单据、录入人、录入时间</td></tr>
+<tr><td>输入</td><td>CargoWare 只读 API 的订单/提单/箱/费用行（15 分钟增量）；供应商账单解析结果（REQ-03）</td></tr>
+<tr><td>输出</td><td>单票费用全景视图（应收 N 行 / 应付 N 行 / 差额 / 未归集行清单）</td></tr>
+<tr><td>授权与排除</td><td>只读，不回写 CargoWare（刘建国：写入需厂家定制 18 万，超预算）；排除进口与拼箱 LCL</td></tr>
+<tr><td>异常处理</td><td>① 订舱号后 6 位撞号 → 需人工确认并记录确认人；② 一票多箱分批出运 → 按箱行展示，不合并；③ 3 个键都无法匹配 → 进"待归集"池，不得静默丢弃</td></tr>
+<tr><td>证据 / 负责人</td><td>E-010、E-018 ／ 赵磊</td></tr>
+<tr><td>验收关联</td><td>AC-01</td></tr>
+</table>
+<h3>REQ-02 费率卡版本与生效期校验（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>单证操作员录入费用、结算专员出账时，系统必须知道"这一笔该用哪一版费率"</td></tr>
+<tr><td>任务</td><td>每笔应收费用必须匹配到唯一「客户 + 费用项 + 生效区间」的费率卡版本；不匹配则阻断开票</td></tr>
+<tr><td>输入</td><td>客户费率卡（结构化后入库，含客户号、费用项、币种、单价、生效起止日、版本号、审批人）</td></tr>
+<tr><td>输出</td><td>匹配结果（版本号 + 生效区间 + 匹配依据）；不匹配则输出"缺费率卡"清单</td></tr>
+<tr><td>授权与排除</td><td>费率维护权限仅结算主管；排除自动改价、自动审批（价格属商务决策）</td></tr>
+<tr><td>异常处理</td><td>① 一票跨生效日 → 按提单签发日取版本，并在视图标注；② 客户合同未约定某费用项 → 标记"合同未覆盖"，需人工确认是否收；③ 版本冲突 → 阻断并提示两份版本差异</td></tr>
+<tr><td>证据 / 负责人</td><td>E-007、E-014 ／ 周慧</td></tr>
+<tr><td>验收关联</td><td>AC-02</td></tr>
+</table>
+<h3>REQ-03 供应商账单解析与逐行比对（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>单证操作员每天 32 封邮件，无法逐封阅读附加费；需要系统把账单变成结构化费用行</td></tr>
+<tr><td>任务</td><td>解析 PDF/Excel 账单为结构化行（费用项、金额、币种、箱号、日期），与系统内应付预估逐行比对，输出差异</td></tr>
+<tr><td>输入</td><td>船司/报关行/拖车/仓库账单（PDF 6 种版式、Excel 2 种版式，E-005）</td></tr>
+<tr><td>输出</td><td>结构化费用行 + 比对结果（一致 / 金额差 / 缺行 / 多行）+ 差异清单</td></tr>
+<tr><td>授权与排除</td><td>解析失败不得静默通过；排除自动付款、自动生成应付凭证</td></tr>
+<tr><td>异常处理</td><td>① 解析置信度 &lt; 阈值 → 转人工并保留原件链接；② 版式未识别 → 进"新模板待建"队列，并告警刘建国；③ 解析失败率 &gt; 5% → 自动降级全人工并通知（RK-03）</td></tr>
+<tr><td>证据 / 负责人</td><td>E-005、E-009 ／ 刘建国</td></tr>
+<tr><td>验收关联</td><td>AC-03</td></tr>
+</table>
+<h3>REQ-04 漏收与重复收费识别（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>结算专员在账单发出前，需要系统告诉她"这票还少了什么、多了什么"</td></tr>
+<tr><td>任务</td><td>以"应有费用模板（按客户费率卡 + 航线条款 + 实际作业项）"对比"已录入应收"，输出缺项与重复项，并给出金额影响</td></tr>
+<tr><td>输入</td><td>应有费用模板、已录应收费用行、供应商账单解析结果</td></tr>
+<tr><td>输出</td><td>开票前检查报告：缺项 N 条（金额）、重复 N 条（金额）、总额偏差</td></tr>
+<tr><td>授权与排除</td><td><strong>只提示不阻断发送</strong>（许安 RL-4：发送必须人点）；超阈值缺项才阻断"生成账单"；不得自动判断合同异议期</td></tr>
+<tr><td>异常处理</td><td>① 缺项金额 &gt; 单票应收 5% → 阻断开票，需主管复核；② 异议期条款因客户而异（7 天/15 天/无约定，E-024）→ 由合规配置，<strong>不得硬编码 7 天</strong>；③ 同一费用行不同来源 → 标记"疑似重复"需人确认</td></tr>
+<tr><td>证据 / 负责人</td><td>E-001、E-008、E-024 ／ 周慧</td></tr>
+<tr><td>验收关联</td><td>AC-04</td></tr>
+</table>
+<h3>REQ-05 费用追溯链（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>客户问"这 ¥450 是什么"，或审计问"这笔凭什么收"，需要 3 分钟内给出完整依据</td></tr>
+<tr><td>任务</td><td>任意一笔费用可展开四级链路：来源单据（账单/邮件/委托）→ 费率条款（合同条款号/费率卡版本）→ 承担方（客户/我方）→ 凭证（账单行/发票/核销）</td></tr>
+<tr><td>输入</td><td>费用行、来源单据索引、费率卡、合同条款类型、财务凭证号</td></tr>
+<tr><td>输出</td><td>追溯链视图（可折叠）+ 断链提示（哪一级缺证据）</td></tr>
+<tr><td>授权与排除</td><td>合同原文不落库，只存"条款号 + 是否含该费用项 + 有效期"；排除导出合同原文</td></tr>
+<tr><td>异常处理</td><td>① 断链 → 明确显示"缺失：来源单据"，不得用推测填空；② 单据已删除 → 显示删除人与时间；③ 跨客户查询 → 阻断并审计</td></tr>
+<tr><td>证据 / 负责人</td><td>E-002、E-010 ／ 许安</td></tr>
+<tr><td>验收关联</td><td>AC-05</td></tr>
+</table>
+<h3>REQ-06 差异归因与责任人指派（P1）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>月结时 812 条差异，人工无法逐条判断是谁的问题</td></tr>
+<tr><td>任务</td><td>差异自动归类为六类：缺费率卡 / 汇率口径 / 归属错误 / 重复录入 / 账单拆行 / 金额不符，并指派待核实责任人</td></tr>
+<tr><td>输入</td><td>差异清单（REQ-03/04 输出）、责任矩阵（岗位映射）</td></tr>
+<tr><td>输出</td><td>分类统计（按类型/客户/航线）+ 责任人工单</td></tr>
+<tr><td>授权与排除</td><td>只做归类与派单，不做处罚判定</td></tr>
+<tr><td>异常处理</td><td>① 无法归类 → "其他"并计入周报，超过 10% 触发规则复盘；② 责任人有争议 → 升级至赵磊</td></tr>
+<tr><td>证据 / 负责人</td><td>E-010、E-016 ／ 赵磊</td></tr>
+<tr><td>验收关联</td><td>AC-06</td></tr>
+</table>
+<h3>REQ-07 异常与人工控制点（P0）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>改单、补收、减免是高风险动作，必须留痕且双人复核</td></tr>
+<tr><td>任务</td><td>改单/补收/减免必须填写原因码 + 依据单据，超阈值需第二人复核；超阈值差异阻断开票</td></tr>
+<tr><td>输入</td><td>操作请求、金额、原因码、依据单据、操作人</td></tr>
+<tr><td>输出</td><td>复核工单 + 操作审计记录</td></tr>
+<tr><td>授权与排除</td><td>阈值由周慧定（V-05 待确认，暂按：减免 ≤500 单人、&gt;500 双人；补收一律双人）</td></tr>
+<tr><td>异常处理</td><td>① 复核人 == 操作人 → 系统拒绝；② 复核超 24 小时未处理 → 升级提醒；③ 紧急放行 → 需主管书面授权并标记</td></tr>
+<tr><td>证据 / 负责人</td><td>E-012、E-023 ／ 许安</td></tr>
+<tr><td>验收关联</td><td>AC-07</td></tr>
+</table>
+<h3>REQ-08 审计日志与指标看板（P1）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>周慧每月要给总经理看漏收率与结算周期；审计要查"谁导了什么"</td></tr>
+<tr><td>任务</td><td>全量操作审计日志（人/时间/对象/字段/接收方，保存 3 年）+ 六项核心指标看板（M1–M6）</td></tr>
+<tr><td>输入</td><td>系统操作日志、账单数据、工单数据</td></tr>
+<tr><td>输出</td><td>审计日志查询、周/月指标看板、异常导出的自动告警</td></tr>
+<tr><td>授权与排除</td><td>日志仅审计与财务可查；不可修改、不可删除</td></tr>
+<tr><td>异常处理</td><td>① 日志写入失败 → 阻断该操作（不允许无日志操作）；② 指标口径变更 → 需版本化并注明生效日</td></tr>
+<tr><td>证据 / 负责人</td><td>E-011、E-013 ／ 周慧</td></tr>
+<tr><td>验收关联</td><td>AC-08</td></tr>
+</table>
+<h3>REQ-09 数据边界与权限（P0，合规红线）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>客户价格是商业秘密，客服只能看自己客户，导出必须留痕</td></tr>
+<tr><td>任务</td><td>字段级权限矩阵 + 客户隔离 + 导出全留痕 + 外部调用禁止携带价格字段</td></tr>
+<tr><td>输入</td><td>用户角色、客户归属、字段敏感级</td></tr>
+<tr><td>输出</td><td>权限矩阵、脱敏视图、导出记录</td></tr>
+<tr><td>授权与排除</td><td>具体脱敏粒度待 V-04 定（字段级加密 vs 内网只读+水印）；<strong>排除任何云端模型接收费率/单价/毛利字段</strong>（RL-1）</td></tr>
+<tr><td>异常处理</td><td>① 越权访问 → 拒绝 + 告警 + 记录；② 导出含敏感字段 → 需二次确认并加水印；③ 外部模型调用含价格字段 → 请求直接拦截</td></tr>
+<tr><td>证据 / 负责人</td><td>E-021、E-023 ／ 许安</td></tr>
+<tr><td>验收关联</td><td>AC-09</td></tr>
+</table>
+<h3>REQ-10 单票追溯包导出（P1）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>角色 / 场景</td><td>客服回答客户质疑时，需要一份"能直接发过去"的材料</td></tr>
+<tr><td>任务</td><td>一键导出单票追溯包：费用明细 + 来源单据影像 + 费率依据 + 比对结果，PDF 格式</td></tr>
+<tr><td>输入</td><td>REQ-01/03/05 的输出</td></tr>
+<tr><td>输出</td><td>PDF 追溯包（脱敏，不含其他客户信息与内部毛利）</td></tr>
+<tr><td>授权与排除</td><td>导出必须留痕（RL-2）；不含毛利、成本、其他客户信息；不自动发送给客户（人点）</td></tr>
+<tr><td>异常处理</td><td>① 存在断链 → 导出时明确标注"该项缺来源单据"；② 单据影像涉密 → 打码后导出并记录打码范围</td></tr>
+<tr><td>证据 / 负责人</td><td>E-011、E-025 ／ 赵磊</td></tr>
+<tr><td>验收关联</td><td>AC-10</td></tr>
+</table>
+<hr/>
+<h2>三、追溯矩阵（需求 ↔ 证据 ↔ 问题 ↔ 验收）</h2>
+<table>
+<tr><th>REQ</th><th>对应问题</th><th>依据证据</th><th>支撑的一致点</th><th>验收条目</th><th>业务负责人</th><th>目标阶段</th></tr>
+<tr><td>REQ-01</td><td>P-07</td><td>E-010、E-018</td><td>A1</td><td>AC-01</td><td>赵磊</td><td>05 构建</td></tr>
+<tr><td>REQ-02</td><td>P-02</td><td>E-007、E-014</td><td>A2</td><td>AC-02</td><td>周慧</td><td>05 构建</td></tr>
+<tr><td>REQ-03</td><td>P-03</td><td>E-005、E-009</td><td>A2</td><td>AC-03</td><td>刘建国</td><td>05 构建</td></tr>
+<tr><td>REQ-04</td><td>P-01、P-06</td><td>E-001、E-008、E-024</td><td>A2、A5</td><td>AC-04</td><td>周慧</td><td>05 构建</td></tr>
+<tr><td>REQ-05</td><td>P-05</td><td>E-002、E-010</td><td>A3</td><td>AC-05</td><td>许安</td><td>05 构建</td></tr>
+<tr><td>REQ-06</td><td>P-03、P-07</td><td>E-010、E-016</td><td>A1</td><td>AC-06</td><td>赵磊</td><td>05 构建</td></tr>
+<tr><td>REQ-07</td><td>P-04</td><td>E-012、E-023</td><td>A4</td><td>AC-07</td><td>许安</td><td>05 构建</td></tr>
+<tr><td>REQ-08</td><td>P-08</td><td>E-011、E-013</td><td>A3</td><td>AC-08</td><td>周慧</td><td>05 构建</td></tr>
+<tr><td>REQ-09</td><td>合规红线</td><td>E-021、E-023</td><td>A4</td><td>AC-09</td><td>许安</td><td>04 设计</td></tr>
+<tr><td>REQ-10</td><td>P-08</td><td>E-011、E-025</td><td>A3</td><td>AC-10</td><td>赵磊</td><td>06 评估</td></tr>
+</table>
+<p><strong>反向检查（每条证据是否被用上）</strong>：E-001~E-025 中 19 条被需求引用；E-003（毛利表）仅用于价值论证、E-015（模板版本差异）留待 REQ-08 指标；E-017/E-019/E-020 用于架构约束（REQ-09）。<strong>无孤儿需求</strong>（每条 REQ 至少 1 条证据 + 1 个问题），<strong>无孤儿证据</strong>（每条证据至少指向一个需求或明确标注"仅用于价值论证"）。</p>
+<hr/>
+<h2>四、非功能需求</h2>
+<table>
+<tr><th>编号</th><th>类别</th><th>要求</th><th>依据</th></tr>
+<tr><td>NFR-01</td><td>性能</td><td>单票追溯 ≤2 秒；200 票批量比对 ≤3 分钟</td><td>42 分钟 → 8 分钟目标</td></tr>
+<tr><td>NFR-02</td><td>可用性</td><td>月末结算期（每月 1–5 日）可用性 ≥99.5%</td><td>RK-05</td></tr>
+<tr><td>NFR-03</td><td>数据时效</td><td>依赖 CargoWare 15 分钟增量；需展示"数据截止时间"</td><td>E-017</td></tr>
+<tr><td>NFR-04</td><td>可维护</td><td>账单解析模板可配置，不写死代码</td><td>E-005</td></tr>
+<tr><td>NFR-05</td><td>审计</td><td>全量操作日志 3 年，不可篡改</td><td>RL-2</td></tr>
+<tr><td>NFR-06</td><td>部署</td><td>内网部署，禁止外部模型接收价格字段</td><td>RL-1</td></tr>
+<tr><td>NFR-07</td><td>降级</td><td>解析失败率 &gt;5% 自动降级人工并告警</td><td>RK-03</td></tr>
+</table>
+<hr/>
+<h2>五、需求确认记录（待签）</h2>
+<table>
+<tr><th>角色</th><th>姓名</th><th>确认内容</th><th>状态</th></tr>
+<tr><td>业务负责人</td><td>赵磊</td><td>范围与 REQ-01/06/10</td><td>待签</td></tr>
+<tr><td>财务总监</td><td>周慧</td><td>阈值与 REQ-02/04/08</td><td>待签</td></tr>
+<tr><td>合规</td><td>许安</td><td>REQ-05/07/09 与红线一致性</td><td>待签</td></tr>
+<tr><td>使用者代表</td><td>陈莉莉</td><td>可用性、REQ-01/04/05</td><td>待签</td></tr>
+<tr><td>技术负责人</td><td>刘建国</td><td>REQ-03 与接口边界</td><td>待签</td></tr>
+</table>
+<blockquote>未签完之前，REQ 状态为"草案"，不得进入构建。</blockquote><hr style="border-top:1px solid #d8e4f0;page-break-after:always"/><h1>验收标准清单（AC-01 ~ AC-10）</h1>
+<p><strong>阶段</strong>：03 需求定义 · 任务 3 约定验收标准 ｜ <strong>版本</strong>：v1.0 ｜ <strong>日期</strong>：2026-11-05 <strong>填写提纲</strong>：REQ 编号 → 样本和前置条件 → 操作 → 预期结果与阈值 → 必须拒绝的条件 → 评审及签核人 <strong>原则</strong>：阈值是客户认的，不是自己定的；"一例都不能接受"的错误必须单列。</p>
+<hr/>
+<h2>一、通用验收前提</h2>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>评估集</td><td>从 2026 Q3 的 1,268 票中分层抽样 200 票（覆盖 6 家船司、3 种币种、含 34 票已知漏收、23 票已知重复收费）</td></tr>
+<tr><td>对照基准</td><td>陈莉莉与周慧人工复核结果（双人独立核对，分歧由赵磊裁决）</td></tr>
+<tr><td>环境</td><td>内网测试环境，CargoWare 只读数据快照（截止 2026-09-30）</td></tr>
+<tr><td>判定方式</td><td>逐条比对 + 抽样人工复核（每类抽 20 条）</td></tr>
+<tr><td>不通过处理</td><td>任一零容忍项出现即整版不通过，回归后重新提交，不做"部分通过"</td></tr>
+</table>
+<hr/>
+<h2>二、逐条验收标准</h2>
+<h3>AC-01 单票费用归集（对应 REQ-01）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>200 票（含 12 票多箱分批、7 票订舱号后 6 位撞号）</td></tr>
+<tr><td>操作</td><td>打开单票，比对系统归集的应收/应付行数与人工核对结果</td></tr>
+<tr><td>预期结果与阈值</td><td>归集完整率 <strong>≥99%</strong>；未归集行 100% 进入"待归集"池并可见；单票加载 ≤2 秒</td></tr>
+<tr><td>必须拒绝</td><td>① 任何费用行被静默丢弃（无任何提示）；② 撞号导致错挂而无人工确认记录</td></tr>
+<tr><td>评审/签核</td><td>陈莉莉评审，赵磊签核</td></tr>
+</table>
+<h3>AC-02 费率卡版本校验（对应 REQ-02）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>30 票已知漏收 + 30 票正常票（各含跨生效日 5 票）</td></tr>
+<tr><td>操作</td><td>触发校验，检查匹配到的版本号与生效区间</td></tr>
+<tr><td>预期结果与阈值</td><td>版本匹配准确率 <strong>≥98%</strong>；缺费率卡的票 <strong>100% 被阻止开票</strong>；跨生效日按提单签发日取值正确率 100%</td></tr>
+<tr><td>必须拒绝</td><td>① 任一票在"无有效费率卡"情况下仍生成账单；② 系统擅自选用"最新版本"而不校验生效期</td></tr>
+<tr><td>评审/签核</td><td>周慧 + 陈莉莉评审，周慧签核</td></tr>
+</table>
+<h3>AC-03 供应商账单解析与比对（对应 REQ-03）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>8 种版式各 10 份，共 80 份账单（PDF 60 + Excel 20），含 10 份模糊扫描件</td></tr>
+<tr><td>操作</td><td>批量解析，比对结构化字段（费用项、金额、币种、箱号）</td></tr>
+<tr><td>预期结果与阈值</td><td>关键字段（金额、箱号）准确率 <strong>≥98%</strong>；费用项名称归一准确率 ≥95%；版式识别率 ≥90%；单份解析 ≤10 秒</td></tr>
+<tr><td>必须拒绝</td><td>① 解析失败却标记为"成功"并给出 0 金额；② 金额识别错误且未进入人工复核；③ 账单原件未保留索引</td></tr>
+<tr><td>评审/签核</td><td>张伟评审，刘建国签核</td></tr>
+</table>
+<h3>AC-04 漏收与重复收费识别（对应 REQ-04）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>200 票，其中 34 票构造/已知漏收（合计 ¥12.4 万）、23 票已知重复</td></tr>
+<tr><td>操作</td><td>出账前检查，与人工复核结果比对</td></tr>
+<tr><td>预期结果与阈值</td><td>漏收<strong>金额</strong>识别率 <strong>≥95%</strong>；漏收票识别率 ≥90%；误报率 <strong>≤5%</strong>；重复收费识别率 100%（23/23）</td></tr>
+<tr><td>必须拒绝</td><td>① 漏收被判为"正常"（漏检）；② 缺项金额 &gt; 单票应收 5% 时不阻断开票；③ 系统自动发出补收函/账单（未人点）；④ 将异议期硬编码为 7 天导致误判</td></tr>
+<tr><td>评审/签核</td><td>周慧 + 许安评审，周慧签核</td></tr>
+</table>
+<h3>AC-05 费用追溯链（对应 REQ-05）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>100 笔随机费用行 + 10 笔已知断链（供应商账单未到）</td></tr>
+<tr><td>操作</td><td>展开四级链路，检查每级是否有可点击的原件</td></tr>
+<tr><td>预期结果与阈值</td><td>链路完整率 <strong>100%</strong>（每笔可展开到来源单据，或明确标注"缺 XX 级"）；单笔展开 ≤2 秒；断链识别准确 10/10</td></tr>
+<tr><td>必须拒绝</td><td>① 任一费用行"看起来完整"但实际无原件支撑（虚假完整）；② 推测性填充缺失节点；③ 追溯过程中读取到合同原文并落库</td></tr>
+<tr><td>评审/签核</td><td>许安 + 陈莉莉评审，许安签核</td></tr>
+</table>
+<h3>AC-06 差异归因（对应 REQ-06）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>812 条历史差异（其中已知"账单拆行"假差异 146 条）</td></tr>
+<tr><td>操作</td><td>批量归因，与人工分类比对</td></tr>
+<tr><td>预期结果与阈值</td><td>六分类准确率 <strong>≥85%</strong>；"无法归类"占比 ≤10%；假差异识别率 ≥90%</td></tr>
+<tr><td>必须拒绝</td><td>① 把假差异（账单拆行）计为真实损失；② 归因结果用于处罚而无人工复核</td></tr>
+<tr><td>评审/签核</td><td>陈莉莉评审，赵磊签核</td></tr>
+</table>
+<h3>AC-07 人工控制点（对应 REQ-07）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>构造 20 次改单（含 6 次超阈值）、5 次补收、5 次减免</td></tr>
+<tr><td>操作</td><td>逐次执行并尝试绕过复核</td></tr>
+<tr><td>预期结果与阈值</td><td>超阈值操作 100% 进入双人复核；复核人=操作人 100% 被拒；审计记录 100% 完整（原因码、依据单据、时间、人）</td></tr>
+<tr><td>必须拒绝</td><td>① 任一超阈值操作未经复核即生效；② 同人自审自发；③ 无原因码的改单被接受</td></tr>
+<tr><td>评审/签核</td><td>许安评审并签核（红线项）</td></tr>
+</table>
+<h3>AC-08 审计与指标（对应 REQ-08）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>连续 30 天运行数据</td></tr>
+<tr><td>操作</td><td>核对日志与看板数值</td></tr>
+<tr><td>预期结果与阈值</td><td>日志覆盖率 100%（含导出、越权尝试、降级事件）；M1–M6 指标与财务月报偏差 ≤0.2 个百分点；查询响应 ≤3 秒</td></tr>
+<tr><td>必须拒绝</td><td>① 存在"无日志的操作路径"；② 指标口径变更未版本化</td></tr>
+<tr><td>评审/签核</td><td>周慧签核</td></tr>
+</table>
+<h3>AC-09 数据边界与权限（对应 REQ-09）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>4 类角色账号（结算/单证/客服/财务），20 次越权尝试</td></tr>
+<tr><td>操作</td><td>权限矩阵逐格验证 + 导出留痕验证 + 外部调用拦截验证</td></tr>
+<tr><td>预期结果与阈值</td><td>越权拦截率 100%；导出留痕 100%（含字段清单与接收方）；外部请求携带价格字段拦截率 <strong>100%</strong></td></tr>
+<tr><td>必须拒绝</td><td>① 任一越权访问成功；② 导出无记录；③ 任何价格/毛利字段进入外部模型请求（<strong>一例即拒绝上线</strong>）</td></tr>
+<tr><td>评审/签核</td><td>许安签核（一票否决项）</td></tr>
+</table>
+<h3>AC-10 追溯包导出（对应 REQ-10）</h3>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>样本与前置</td><td>20 票（含 3 票断链、2 票多箱）</td></tr>
+<tr><td>操作</td><td>一键导出 PDF，检查内容与脱敏</td></tr>
+<tr><td>预期结果与阈值</td><td>导出成功 100%；不含毛利/成本/其他客户信息 100%；断链标注 100%；单份生成 ≤5 秒</td></tr>
+<tr><td>必须拒绝</td><td>① 导出内容含其他客户信息；② 断链未标注导致客户误解；③ 导出无审计记录</td></tr>
+<tr><td>评审/签核</td><td>李文静评审，赵磊签核</td></tr>
+</table>
+<hr/>
+<h2>三、零容忍清单（一例即不通过）</h2>
+<blockquote>这五条不参与"准确率"计算，出现一次即整版拒绝，不做任何豁免。</blockquote>
+<table>
+<tr><th>#</th><th>零容忍错误</th><th>后果</th><th>对应条目</th></tr>
+<tr><td>Z-1</td><td>价格/毛利/成本字段进入外部模型或云端请求</td><td>商业秘密泄露，合规事故</td><td>AC-09</td></tr>
+<tr><td>Z-2</td><td>客户账单中出现"无有效费率卡"的收费行</td><td>违规收费，客户投诉升级</td><td>AC-02</td></tr>
+<tr><td>Z-3</td><td>同一费用行重复计入客户账单</td><td>重复收费，需退款并损信誉</td><td>AC-04</td></tr>
+<tr><td>Z-4</td><td>超阈值改单/补收未经双人复核即生效</td><td>内控失效，审计问题</td><td>AC-07</td></tr>
+<tr><td>Z-5</td><td>追溯链"虚假完整"（无原件却显示已追溯）</td><td>审计与实际不符，最危险</td><td>AC-05</td></tr>
+</table>
+<hr/>
+<h2>四、业务目标验收（与三项基线指标挂钩）</h2>
+<table>
+<tr><th>指标</th><th>基线</th><th>验收阈值</th><th>测量方式</th><th>观察期</th></tr>
+<tr><td>漏收率</td><td>1.80%</td><td><strong>≤0.60%</strong></td><td>财务月结同口径</td><td>试点后 2 个完整月</td></tr>
+<tr><td>结算周期（中位/天）</td><td>11.5</td><td><strong>≤6</strong>（P90 ≤9）</td><td>CargoWare 日志</td><td>试点后 2 个月</td></tr>
+<tr><td>账单一次通过率</td><td>71.3%</td><td><strong>≥90%</strong></td><td>客服工单</td><td>试点后 3 个月</td></tr>
+<tr><td>单笔追溯耗时</td><td>42 分钟</td><td><strong>≤8 分钟</strong></td><td>抽样 50 笔计时</td><td>试点后 1 个月</td></tr>
+<tr><td>差异条目</td><td>812 条/季</td><td>≤240 条/季</td><td>差异台账</td><td>试点后 1 个季度</td></tr>
+</table>
+<blockquote>归因方法：试点前锁定 30 票对照组（同客户、同航线、同费用结构），试点后同口径对比，避免"本来就在改善"的质疑（RK-06）。</blockquote>
+<hr/>
+<h2>五、验收组织</h2>
+<table>
+<tr><th>项</th><th>内容</th></tr>
+<tr><td>验收发起</td><td>赵磊</td></tr>
+<tr><td>技术验收</td><td>刘建国（性能、接口、降级、日志）</td></tr>
+<tr><td>业务验收</td><td>陈莉莉（可用性）+ 李文静（客户视角）</td></tr>
+<tr><td>合规验收</td><td>许安（RL-1~RL-6，一票否决）</td></tr>
+<tr><td>终审</td><td>王振华（上线决定）</td></tr>
+<tr><td>记录</td><td>每次验收出具《验收结论单》，含样本、结果、未通过项、整改期限</td></tr>
+</table>
+<hr/>
+<p><strong>说明</strong>：本清单的阈值需经周慧、陈莉莉书面确认后方生效（当前为草案）。未经确认的阈值不得写入测试用例。</p></body></html>

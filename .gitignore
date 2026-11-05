@@ -1,0 +1,23 @@
+# 操作系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# 本地导出临时件（Word/PDF 中间产物不入库，正式交付见 export/）
+export/~$*.docx
+export/*.tmp
+tmp/
+*.log
+
+# 敏感数据（本项目不存放任何客户真实数据）
+data/private/
+*.csv.bak
