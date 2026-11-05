@@ -20,8 +20,9 @@
 | GitHub 仓库名 | `trade-settlement-trace-f25015243` |
 | 可见性 | **public**（内容全部为实训构造数据，无真实客户信息，见 LICENSE 声明） |
 | 默认分支 | `main` |
-| 当前状态 | **尚未推送**（项目未完工，Stage 01–02 已完成；等全流程结束后一次性上传） |
-| 推送方式 | `bash tools/push_github.sh`（脚本会检查分支、远端与代理，不保存任何 Token） |
+| 当前状态 | **已推送**（2026-11-05，main 分支，54 个文件） |
+| 在线地址 | https://github.com/yuzhouwudizhizuntianwang/trade-settlement-trace-f25015243 |
+| 推送方式 | `git push`（已配置 origin 与上游）；Token 不落盘，需要时重新生成 |
 
 ---
 
