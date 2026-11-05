@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="700" viewBox="0 0 1420 700" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+<rect width="1420" height="700" fill="#f4f7fb"/>
+<text x="40" y="46" font-size="20" font-weight="bold" fill="#0b2a4a">现场系统截图还原 · CargoWare 费用行字段与共享盘费率表目录</text>
+<text x="40" y="70" font-size="11.5" fill="#5b6f83">对应证据：E-018（附加费仅有自由文本备注，无来源单据字段）、E-007（共享盘 7 个费率表版本，无版本号与生效期）　｜　企业与人名为实训构造</text>
+<rect x="40" y="96" width="760" height="470" rx="6" fill="#ffffff" stroke="#c7d5e4" stroke-width="1.2"/><rect x="40" y="96" width="760" height="34" rx="6" fill="#eef2f7" stroke="#c7d5e4"/><rect x="40" y="120" width="760" height="10" fill="#eef2f7"/><text x="56" y="119" font-size="12" fill="#1c2b3a">▣  CargoWare · 订舱单 BK2610-0187 / 提单 HLCUNB26100457 · 费用行</text><circle cx="778" cy="113" r="5" fill="#e2685f"/><circle cx="758" cy="113" r="5" fill="#e8b24a"/><circle cx="738" cy="113" r="5" fill="#61b46a"/>
+<rect x="40" y="130" width="760" height="30" fill="#f7fafd" stroke="#c7d5e4"/>
+<rect x="52" y="137" width="86" height="17" rx="3" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="95" y="149" text-anchor="middle" font-size="10" fill="#1c2b3a">保存(F8)</text>
+<rect x="148" y="137" width="86" height="17" rx="3" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="191" y="149" text-anchor="middle" font-size="10" fill="#1c2b3a">费用校验</text>
+<rect x="244" y="137" width="86" height="17" rx="3" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="287" y="149" text-anchor="middle" font-size="10" fill="#1c2b3a">导出 Excel</text>
+<rect x="340" y="137" width="86" height="17" rx="3" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="383" y="149" text-anchor="middle" font-size="10" fill="#1c2b3a">打印</text>
+<text x="786" y="149" text-anchor="end" font-size="10" fill="#b03a2e">校验规则：未配置</text>
+<rect x="40" y="170" width="760" height="26" fill="#1a5fa8"/>
+<text x="54" y="188" font-size="10.5" fill="#ffffff">费用代码</text>
+<text x="136" y="188" font-size="10.5" fill="#ffffff">费用名称</text>
+<text x="244" y="188" font-size="10.5" fill="#ffffff">方向</text>
+<text x="296" y="188" font-size="10.5" fill="#ffffff">币种</text>
+<text x="348" y="188" font-size="10.5" fill="#ffffff">金额</text>
+<text x="444" y="188" font-size="10.5" fill="#ffffff">备注 fee_remark</text>
+<text x="708" y="188" font-size="10.5" fill="#ffffff">录入人</text>
+<rect x="40" y="196" width="760" height="46" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="54" y="224" font-size="10.5" fill="#1c2b3a">OCF</text>
+<text x="136" y="224" font-size="10.5" fill="#1c2b3a">海运费</text>
+<text x="244" y="224" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="224" font-size="10.5" fill="#1c2b3a">USD</text>
+<text x="348" y="224" font-size="10.5" fill="#1c2b3a">1,850.00</text>
+<text x="444" y="224" font-size="10.5" fill="#1c2b3a">40HQ 宁波—鹿特丹</text>
+<text x="708" y="224" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="242" width="760" height="46" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="54" y="270" font-size="10.5" fill="#1c2b3a">THC</text>
+<text x="136" y="270" font-size="10.5" fill="#1c2b3a">码头操作费</text>
+<text x="244" y="270" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="270" font-size="10.5" fill="#1c2b3a">CNY</text>
+<text x="348" y="270" font-size="10.5" fill="#1c2b3a">1,260.00</text>
+<text x="444" y="270" font-size="10.5" fill="#1c2b3a">-</text>
+<text x="708" y="270" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="288" width="760" height="46" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="54" y="316" font-size="10.5" fill="#1c2b3a">CUS</text>
+<text x="136" y="316" font-size="10.5" fill="#1c2b3a">报关费</text>
+<text x="244" y="316" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="316" font-size="10.5" fill="#1c2b3a">CNY</text>
+<text x="348" y="316" font-size="10.5" fill="#1c2b3a">380.00</text>
+<text x="444" y="316" font-size="10.5" fill="#1c2b3a">单证 2 份</text>
+<text x="708" y="316" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="334" width="760" height="46" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="54" y="362" font-size="10.5" fill="#1c2b3a">TRK</text>
+<text x="136" y="362" font-size="10.5" fill="#1c2b3a">拖车费</text>
+<text x="244" y="362" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="362" font-size="10.5" fill="#1c2b3a">CNY</text>
+<text x="348" y="362" font-size="10.5" fill="#1c2b3a">1,150.00</text>
+<text x="444" y="362" font-size="10.5" fill="#1c2b3a">北仑—工厂</text>
+<text x="708" y="362" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="380" width="760" height="46" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="54" y="408" font-size="10.5" fill="#1c2b3a">AGY</text>
+<text x="136" y="408" font-size="10.5" fill="#1c2b3a">代理费</text>
+<text x="244" y="408" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="408" font-size="10.5" fill="#1c2b3a">CNY</text>
+<text x="348" y="408" font-size="10.5" fill="#1c2b3a">720.00</text>
+<text x="444" y="408" font-size="10.5" fill="#1c2b3a">协议价</text>
+<text x="708" y="408" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="426" width="760" height="46" fill="#fff8ea" stroke="#c7d5e4"/>
+<text x="54" y="454" font-size="10.5" fill="#1c2b3a">SUR</text>
+<text x="136" y="454" font-size="10.5" fill="#1c2b3a">附加费</text>
+<text x="244" y="454" font-size="10.5" fill="#1c2b3a">应收</text>
+<text x="296" y="454" font-size="10.5" fill="#1c2b3a">CNY</text>
+<text x="348" y="454" font-size="10.5" fill="#1c2b3a">0.00</text>
+<text x="444" y="454" font-size="10.5" fill="#b03a2e">LSS1180 / PSS980（口头待确认）</text>
+<text x="708" y="454" font-size="10.5" fill="#1c2b3a">张伟</text>
+<rect x="40" y="472" width="760" height="30" fill="#f7fafd" stroke="#c7d5e4"/>
+<text x="54" y="492" font-size="10.5" fill="#5b6f83">共 6 行　费用合计 USD 1,850.00 / CNY 3,510.00　<tspan fill="#b03a2e">来源单据编号：字段不存在</tspan></text>
+<text x="450" y="530" font-size="10.5" fill="#b03a2e">↑ 附加费金额为 0，实际金额只写在备注里（¥1,180 + ¥980）</text>
+<text x="450" y="548" font-size="10.5" fill="#b03a2e">↑ 改配费 ¥450 连备注都没有，只在微信群里说过</text>
+<rect x="838" y="186" width="540" height="380" rx="6" fill="#ffffff" stroke="#c7d5e4" stroke-width="1.2"/><rect x="838" y="186" width="540" height="34" rx="6" fill="#eef2f7" stroke="#c7d5e4"/><rect x="838" y="210" width="540" height="10" fill="#eef2f7"/><text x="854" y="209" font-size="12" fill="#1c2b3a">▣  \\HC-FS01\结算\费率\</text><circle cx="1356" cy="203" r="5" fill="#e2685f"/><circle cx="1336" cy="203" r="5" fill="#e8b24a"/><circle cx="1316" cy="203" r="5" fill="#61b46a"/>
+<rect x="846" y="228" width="524" height="24" rx="3" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="854" y="244" font-size="10" fill="#5b6f83">\\HC-FS01\结算\费率\</text>
+<rect x="838" y="258" width="540" height="24" fill="#eef3f9" stroke="#c7d5e4"/>
+<text x="850" y="274" font-size="10" fill="#1c2b3a">名称</text>
+<text x="1366" y="274" text-anchor="end" font-size="10" fill="#1c2b3a">修改日期</text>
+<rect x="838" y="282" width="540" height="36" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="850" y="297" font-size="10.5" fill="#1c2b3a">📄 费率表_2026_V1.xlsx</text>
+<text x="1366" y="297" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-01-03 09:12</text>
+<rect x="838" y="318" width="540" height="36" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="850" y="333" font-size="10.5" fill="#1c2b3a">📄 费率表_2026_V2.xlsx</text>
+<text x="1366" y="333" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-03-15 16:40</text>
+<rect x="838" y="354" width="540" height="36" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="850" y="369" font-size="10.5" fill="#1c2b3a">📄 费率表_2026_V3.xlsx</text>
+<text x="1366" y="369" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-06-30 11:05</text>
+<rect x="838" y="390" width="540" height="36" fill="#fff8ea" stroke="#c7d5e4"/>
+<text x="850" y="405" font-size="10.5" fill="#b03a2e">📄 费率表_2026_V3最终版.xlsx</text>
+<text x="850" y="419" font-size="9" fill="#b03a2e">← 10-25 出账实际引用</text>
+<text x="1366" y="405" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-09-12 17:22</text>
+<rect x="838" y="426" width="540" height="36" fill="#fff8ea" stroke="#c7d5e4"/>
+<text x="850" y="441" font-size="10.5" fill="#b03a2e">📄 费率表_2026_V3最终版_改.xlsx</text>
+<text x="850" y="455" font-size="9" fill="#b03a2e">← LSS 调价真实生效</text>
+<text x="1366" y="441" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-10-09 08:31</text>
+<rect x="838" y="462" width="540" height="36" fill="#fff8ea" stroke="#c7d5e4"/>
+<text x="850" y="477" font-size="10.5" fill="#b03a2e">📄 费率表_2026_最终版2.xlsx</text>
+<text x="1366" y="477" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-10-16 14:58</text>
+<rect x="838" y="498" width="540" height="36" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="850" y="513" font-size="10.5" fill="#1c2b3a">📄 费率表_临时试算.xlsx</text>
+<text x="1366" y="513" text-anchor="end" font-size="9.5" fill="#5b6f83">2026-10-20 19:03</text>
+<text x="850" y="554" font-size="10" fill="#b03a2e">7 个版本 · 无版本号字段 · 无生效期字段 · 无审批记录</text>
+<rect x="40" y="592" width="1340" height="88" rx="8" fill="#ffffff" stroke="#c7d5e4"/>
+<text x="58" y="620" font-size="11.5" fill="#1c2b3a">读图要点：① 费用行只有“备注”一个自由文本字段，附加费无法结构化，也无法回指来源单据（制度第 3.2 条要求有编号）；</text>
+<text x="58" y="642" font-size="11.5" fill="#1c2b3a">② 费率表以“最终版/最终版2/改”命名，新老版本并存，出账取哪一版全凭记忆（制度第 5.1 条要求登记版本与生效期）。</text>
+<text x="58" y="664" font-size="10.5" fill="#5b6f83">结论：制度有要求、系统无承载、执行靠人记——这正是阶段 02 四来源收敛中 Operator 与 Buyer 分歧（M-01）的物证。</text>
+</svg>
