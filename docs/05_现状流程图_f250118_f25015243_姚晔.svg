@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1210" viewBox="0 0 1700 1210" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+<defs>
+<marker id="ah-main" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#33506e"/></marker>
+<marker id="ah-exc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c0503c"/></marker>
+<marker id="ah-ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7d5a"/></marker>
+</defs>
+<rect width="1700" height="1210" fill="#ffffff"/>
+<text x="54" y="52" font-size="26" font-weight="bold" fill="#0b2a4a">海川服贸 · 贸易服务结算与费用追溯 — 现状流程图（AS-IS）</text>
+<text x="54" y="80" font-size="12" fill="#5b6f83">依据：6 人角色访谈 285 分钟 · 跟岗 2 小时 · 24 条证据（E-001~E-025）</text>
+<text x="54" y="100" font-size="12" fill="#5b6f83">13 步主流程 + 3 条异常路径（X-01~X-03）+ 5 个判断点（P1~P5）　｜　全程人工操作，无任何 AI 介入</text>
+<rect x="1108" y="26" width="552" height="86" rx="8" fill="#f7fafd" stroke="#e2ecf6"/>
+<path d="M 1122,50 L 1168,50" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1178" y="54" font-size="11.5" fill="#1c2b3a">主导流程<tspan fill="#5b6f83"> 实线</tspan></text>
+<path d="M 1122,74 L 1168,74" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1178" y="78" font-size="11.5" fill="#1c2b3a">异常路径<tspan fill="#5b6f83"> 红色虚线</tspan></text>
+<path d="M 1122,98 L 1168,98" fill="none" stroke="#2f7d5a" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-ret)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1178" y="102" font-size="11.5" fill="#1c2b3a">退回 / 补正<tspan fill="#5b6f83"> 绿色虚线</tspan></text>
+<polygon points="1400,40 1430,56 1400,72 1370,56" fill="#eef8f1" stroke="#5f9d7c"/>
+<text x="1440" y="53" font-size="11.5" fill="#1c2b3a">判断点<tspan fill="#5b6f83"> 人工决策</tspan></text>
+<rect x="1370" y="82" width="60" height="20" rx="5" fill="#fdeee9" stroke="#c26450"/>
+<text x="1440" y="97" font-size="11.5" fill="#1c2b3a">人工控制点<tspan fill="#5b6f83"> 须留痕</tspan></text>
+<rect x="40" y="130" width="1620" height="130" fill="#f8fbfe" stroke="#dbe7f3"/>
+<rect x="40" y="130" width="130" height="130" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="191.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">客户</text>
+<text x="105" y="209.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">发起委托</text>
+<text x="105" y="222.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">收货提异议</text>
+<rect x="40" y="260" width="1620" height="400" fill="#ffffff" stroke="#dbe7f3"/>
+<rect x="40" y="260" width="130" height="400" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="456.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">单证操作员</text>
+<text x="105" y="474.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">张伟</text>
+<text x="105" y="487.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">建单/订舱/录费用</text>
+<rect x="40" y="660" width="1620" height="120" fill="#f8fbfe" stroke="#dbe7f3"/>
+<rect x="40" y="660" width="130" height="120" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="716.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">供应商·船司</text>
+<text x="105" y="734.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">5 家船司</text>
+<text x="105" y="747.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">回传账单</text>
+<rect x="40" y="780" width="1620" height="180" fill="#ffffff" stroke="#dbe7f3"/>
+<rect x="40" y="780" width="130" height="180" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="866.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">结算专员</text>
+<text x="105" y="884.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">陈莉莉</text>
+<text x="105" y="897.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">汇总/核对/出账</text>
+<rect x="40" y="960" width="1620" height="90" fill="#f8fbfe" stroke="#dbe7f3"/>
+<rect x="40" y="960" width="130" height="90" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="1001.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">客服主管</text>
+<text x="105" y="1019.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">李文静</text>
+<text x="105" y="1032.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">受理客户异议</text>
+<rect x="40" y="1050" width="1620" height="90" fill="#ffffff" stroke="#dbe7f3"/>
+<rect x="40" y="1050" width="130" height="90" fill="#eaf2fb" stroke="#dbe7f3"/>
+<text x="105" y="1091.0" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#12467d">财务</text>
+<text x="105" y="1109.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">周慧</text>
+<text x="105" y="1122.0" text-anchor="middle" font-size="9.5" fill="#5b6f83">核销 / 月结</text>
+<rect x="210" y="157" width="190" height="76" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="223" y="184" font-size="13.5" font-weight="bold" fill="#0f3f70">① 客户委托下单</text><text x="223" y="205" font-size="11" fill="#5b6f83">邮件 / 微信 / 客户系统</text>
+<polygon points="1525.0,153 1601.0,195 1525.0,237 1449.0,195" fill="#eef8f1" stroke="#5f9d7c" stroke-width="1.4"/><text x="1525.0" y="194" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1d5c41">7 日内提异议？</text><text x="1525.0" y="209" text-anchor="middle" font-size="9.5" fill="#5b6f83">P4 · 合同 §7.2</text>
+<rect x="210" y="290" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="223" y="317" font-size="13.5" font-weight="bold" fill="#0f3f70">② 建单·生成费用模板</text><text x="223" y="338" font-size="11" fill="#5b6f83">CargoWare 建单</text><text x="223" y="354" font-size="11" fill="#5b6f83">空白费用行，无校验</text>
+<polygon points="549.0,292 625.0,334 549.0,376 473.0,334" fill="#eef8f1" stroke="#5f9d7c" stroke-width="1.4"/><text x="549.0" y="333" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1d5c41">新客户 / 新航线？</text><text x="549.0" y="348" text-anchor="middle" font-size="9.5" fill="#5b6f83">P1</text>
+<rect x="698" y="290" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="711" y="317" font-size="13.5" font-weight="bold" fill="#0f3f70">③ 订舱 / 报关 / 派车</text><text x="711" y="338" font-size="11" fill="#5b6f83">生成订舱号·提单号</text><text x="711" y="354" font-size="11" fill="#5b6f83">作业项决定应收科目</text>
+<rect x="942" y="290" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="955" y="317" font-size="13.5" font-weight="bold" fill="#0f3f70">④ 录入应付预估</text><text x="955" y="338" font-size="11" fill="#5b6f83">附加费写成自由文本</text><text x="955" y="354" font-size="11" fill="#5b6f83">fee_remark 非字典值</text>
+<rect x="454" y="404" width="190" height="64" rx="9" fill="#fdeee9" stroke="#c26450" stroke-width="1.4"/><text x="467" y="431" font-size="13.5" font-weight="bold" fill="#0f3f70">报价审批（赵磊）</text><text x="467" y="452" font-size="11" fill="#5b6f83">→ 更新共享盘费率表</text>
+<polygon points="793.0,518 869.0,560 793.0,602 717.0,560" fill="#eef8f1" stroke="#5f9d7c" stroke-width="1.4"/><text x="793.0" y="559" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1d5c41">与预估一致？</text><text x="793.0" y="574" text-anchor="middle" font-size="9.5" fill="#5b6f83">P2 · 人工目视比对</text>
+<rect x="454" y="522" width="190" height="76" rx="9" fill="#fff8ea" stroke="#cf9a46" stroke-width="1.4" stroke-dasharray="5 4"/><text x="467" y="549" font-size="13.5" font-weight="bold" fill="#0f3f70">记入差异台账.xlsx</text><text x="467" y="570" font-size="11" fill="#5b6f83">人工比对，事后无跟踪</text>
+<rect x="942" y="690" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="955" y="717" font-size="13.5" font-weight="bold" fill="#0f3f70">⑤ 船司/供应商回传账单</text><text x="955" y="738" font-size="11" fill="#5b6f83">邮件 PDF/Excel，无固定模板</text><text x="955" y="754" font-size="11" fill="#5b6f83">平均晚到 6.8 天（P90 11 天）</text>
+<rect x="1186" y="690" width="190" height="76" rx="9" fill="#fff8ea" stroke="#cf9a46" stroke-width="1.4" stroke-dasharray="5 4"/><text x="1199" y="717" font-size="13.5" font-weight="bold" fill="#0f3f70">甩柜 / 改配（X-01）</text><text x="1199" y="738" font-size="11" fill="#5b6f83">只在微信群通知</text><text x="1199" y="754" font-size="11" fill="#5b6f83">附加费未进系统</text>
+<rect x="698" y="800" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="711" y="827" font-size="13.5" font-weight="bold" fill="#0f3f70">⑥ 汇总应收（导出 Excel）</text><text x="711" y="848" font-size="11" fill="#5b6f83">只有金额合计</text><text x="711" y="864" font-size="11" fill="#5b6f83">无附加费明细</text>
+<rect x="942" y="800" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="955" y="827" font-size="13.5" font-weight="bold" fill="#0f3f70">⑦ 按费率卡核对金额</text><text x="955" y="848" font-size="11" fill="#5b6f83">共享盘 7 个“最终版”</text><text x="955" y="864" font-size="11" fill="#5b6f83">P3 合同项靠翻 PDF 判断</text>
+<rect x="1186" y="800" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="1199" y="827" font-size="13.5" font-weight="bold" fill="#0f3f70">⑧ Excel 拼账单（41 行）</text><text x="1199" y="848" font-size="11" fill="#5b6f83">自建模板 V6/V4/V5</text><text x="1199" y="864" font-size="11" fill="#5b6f83">手填，无校验</text>
+<rect x="1430" y="800" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="1443" y="827" font-size="13.5" font-weight="bold" fill="#0f3f70">⑨ 发客户账单</text><text x="1443" y="848" font-size="11" fill="#5b6f83">邮件发出即起算</text><text x="1443" y="864" font-size="11" fill="#5b6f83">异议窗口</text>
+<rect x="1186" y="900" width="190" height="56" rx="9" fill="#fff8ea" stroke="#cf9a46" stroke-width="1.4" stroke-dasharray="5 4"/><text x="1199" y="927" font-size="13.5" font-weight="bold" fill="#0f3f70">多箱分批 → 模板复制（X-02）</text><text x="1199" y="948" font-size="11" fill="#5b6f83">同一费用行重复计入</text>
+<rect x="942" y="966" width="190" height="88" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="955" y="993" font-size="13.5" font-weight="bold" fill="#0f3f70">⑪ 受理异议·转结算</text><text x="955" y="1014" font-size="11" fill="#5b6f83">仅能转单，无明细权限</text><text x="955" y="1030" font-size="11" fill="#5b6f83">答复周期 1.2 天</text>
+<polygon points="793.0,964 867.0,1002 793.0,1040 719.0,1002" fill="#eef8f1" stroke="#5f9d7c" stroke-width="1.4"/><text x="793.0" y="1001" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1d5c41">是否补收 / 减免？</text><text x="793.0" y="1016" text-anchor="middle" font-size="9.5" fill="#5b6f83">P5 · 赵磊拍板</text>
+<rect x="698" y="1060" width="190" height="62" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="711" y="1087" font-size="13.5" font-weight="bold" fill="#0f3f70">⑫ 收款核销</text><text x="711" y="1108" font-size="11" fill="#5b6f83">用友 U8</text>
+<rect x="942" y="1060" width="190" height="62" rx="9" fill="#e9f3fd" stroke="#8fb3d9" stroke-width="1.4"/><text x="955" y="1087" font-size="13.5" font-weight="bold" fill="#0f3f70">⑬ 月结对账</text><text x="955" y="1108" font-size="11" fill="#5b6f83">差异挂“待查”，季末 ¥120 万</text>
+<rect x="1186" y="1060" width="190" height="62" rx="9" fill="#fff8ea" stroke="#cf9a46" stroke-width="1.4" stroke-dasharray="5 4"/><text x="1199" y="1087" font-size="13.5" font-weight="bold" fill="#0f3f70">汇率口径（X-03）</text><text x="1199" y="1108" font-size="11" fill="#5b6f83">开票日 vs 发生日</text>
+<path d="M 305.0,233 L 305.0,290" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 400,334 L 473.0,334" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 625.0,334 L 698,334" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/><text x="661" y="326" text-anchor="middle" font-size="11" fill="#33506e" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">否</text>
+<path d="M 549.0,376 L 549.0,404" fill="none" stroke="#2f7d5a" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-ret)" stroke-linejoin="round" stroke-linecap="round"/><text x="561" y="396" text-anchor="start" font-size="11" fill="#2f7d5a" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">是</text>
+<path d="M 644,436 L 1037.0,436 L 1037.0,378" fill="none" stroke="#2f7d5a" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-ret)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 888,334 L 942,334" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1037.0,378 L 1037.0,690" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/><text x="1045" y="640" text-anchor="start" font-size="11" fill="#33506e" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">账单到达（平均 6.8 天）</text>
+<path d="M 942,734.0 L 900,734.0 L 900,560 L 869.0,560" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 717.0,560 L 644,560" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/><text x="686" y="551" text-anchor="middle" font-size="11" fill="#c0503c" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">否</text>
+<path d="M 793.0,602 L 793.0,800" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/><text x="810" y="720" text-anchor="start" font-size="11" fill="#33506e" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">是</text>
+<path d="M 1132,734.0 L 1186,734.0" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1281.0,690 L 1281.0,470 L 1100,470 L 1100,378" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1290" y="498" font-size="10.5" fill="#c0503c">应收未同步</text>
+<path d="M 888,844 L 942,844" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1132,844 L 1186,844" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1376,844 L 1430,844" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1281.0,900 L 1281.0,888" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1525.0,800 L 1525.0,237" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/><text x="1533" y="470" text-anchor="start" font-size="11" fill="#33506e" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">账单到达客户</text>
+<path d="M 1449.0,195 L 1170,195 L 1170,932 L 1037.0,932 L 1037.0,966" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/><text x="1300" y="186" text-anchor="middle" font-size="11" fill="#c0503c" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">是 · 提异议</text>
+<path d="M 1601.0,195 L 1678,195 L 1678,1132 L 793.0,1132 L 793.0,1122" fill="none" stroke="#2f7d5a" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-ret)" stroke-linejoin="round" stroke-linecap="round"/><text x="1666" y="646" text-anchor="end" font-size="11" fill="#2f7d5a" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">否 · 默认确认</text>
+<path d="M 942,1010.0 L 867.0,1002" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/><text x="905" y="996" text-anchor="middle" font-size="11" fill="#c0503c" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">转追溯</text>
+<path d="M 793.0,1040 L 793.0,1060" fill="none" stroke="#2f7d5a" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-ret)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 888,1091 L 942,1091" fill="none" stroke="#33506e" stroke-width="2.0" marker-end="url(#ah-main)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1132,1091 L 1186,1091" fill="none" stroke="#c0503c" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#ah-exc)" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="40" y="1152" width="1620" height="50" rx="8" fill="#f7fafd" stroke="#e2ecf6"/>
+<text x="56" y="1170" font-size="10.5" fill="#5b6f83">读图：实线为主流程；红色虚线为异常/遗漏路径（X-01 改配费只在群里通知、X-02 多箱分批模板复制、X-03 汇率口径不一）；绿色虚线为退回补正。</text>
+<text x="56" y="1183" font-size="10.5" fill="#5b6f83">菱形为必须由人判断的节点：P1 新客户/新航线、P2 账单与预估比对、P3 合同是否含该费用项、P4 异议是否成立、P5 是否补收/减免。</text>
+<text x="56" y="1196" font-size="10.5" fill="#5b6f83">说明：本图为现状还原（AS-IS），不含任何 AI 环节；序号 ①~⑬ 与《03 现场调研分析报告》第二章逐步说明一一对应。</text>
+</svg>

@@ -148,6 +148,17 @@ def md_to_html(md: str) -> str:
             out.append("</ol>")
             continue
 
+        # 独占一行的图片：Word 转换通道不支持内嵌图片，改为一行图注（纯段落，
+        # 不能嵌套表格，否则会被当成文本）。真图见 Markdown 源文件。
+        m_img = re.match(r"^!\[(.*?)\]\((.+?)\)$", stripped)
+        if m_img:
+            alt, src = m_img.group(1), m_img.group(2)
+            out.append('<p style="text-align:center;color:#5b6f83">'
+                       f'［图示］{html.escape(alt)}　—　图片文件：{html.escape(os.path.basename(src))}'
+                       '（Markdown / GitHub 版可直接查看）</p>')
+            i += 1
+            continue
+
         # 段落（合并连续非空行）
         buf = []
         while i < n and lines[i].strip() and not re.match(r"^(#{1,6}\s|\||>|```|-{3,})", lines[i].strip()) \

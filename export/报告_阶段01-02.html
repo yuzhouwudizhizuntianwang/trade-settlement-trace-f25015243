@@ -491,26 +491,8 @@ hr { border: 0; border-top: 1px solid #d8e4f0; margin: 12pt 0; }
 <hr/>
 <h2>二、现状流程还原（任务 2）</h2>
 <h3>2.1 泳道图（13 步主流程 + 3 条异常路径）</h3>
-<pre>客户        │①委托下单 ────────────────⑪收货/提异议 ─────────────
-            │                                                        │
-单证操作     │  ②建单·生成费用模板  ③订舱/报关/派车  ④录费用预估      │
-   (张伟)   │        │                                      │        │
-            │        └─[P1 新客户/新航线?]─是→报价审批→改费率卡      │
-            │                                                        │
-供应商       │            ⑤实际发生，回传账单（邮件/微信，时延 6.8 天）
-   (船司等)  │                        │                              │
-            │                        └─[P2 与预估一致?]─否→记&quot;差异台账.xlsx&quot;
-            │                                                        │
-结算专员     │  ⑥汇总应收(导出Excel) ⑦按费率卡核对 ⑧拼账单(41行) ⑨发客户
-   (陈莉莉)  │        │                     │                        │
-            │        └─[P3 合同含该费用项?]─翻合同PDF(21份)→靠人记     │
-            │                                                        │
-财务         │                          ⑫收款核销 ⑬月结对账（差异挂&quot;待查&quot;）
-   (周慧)   │                                                        │
-            │                                                        │
-客服         │                                    ⑩受理客户询问→转结算→翻单据追溯
-   (李文静)  │                                                        ▼
-            └────────────────────────────────────────────── 闭环(但已过异议窗口)</pre>
+<p style="text-align:center;color:#5b6f83">［图示］现状流程图（泳道 + 判断点 + 异常路径）　—　图片文件：05_现状流程图_f250118_f25015243_姚晔.png（Markdown / GitHub 版可直接查看）</p>
+<blockquote>图 2-1　现状流程图（AS-IS）· 6 条泳道 / 13 步主流程 / 3 条异常路径（X-01~X-03）/ 5 个判断点（P1~P5）<br/>矢量原件见同目录 <code>05_现状流程图_f250118_f25015243_姚晔.svg</code>；本图不含任何 AI 介入环节。</blockquote>
 <p><strong>三条异常路径</strong>：</p>
 <table>
 <tr><th>编号</th><th>异常</th><th>触发条件</th><th>现场怎么处理</th><th>后果</th></tr>
@@ -533,8 +515,9 @@ hr { border: 0; border-top: 1px solid #d8e4f0; margin: 12pt 0; }
 <tr><td>⑦</td><td>结算</td><td>按费率卡核对金额</td><td>执行</td><td>共享盘 Excel（7 版）</td><td>应收金额</td><td>E-007</td></tr>
 <tr><td>⑧</td><td>结算</td><td>拼客户账单（41 行）</td><td>执行</td><td>自建 Excel 模板 V6</td><td>账单草稿</td><td>E-010</td></tr>
 <tr><td>⑨</td><td>结算</td><td>发客户账单</td><td>执行</td><td>邮件</td><td>账单（触发 7 日条款）</td><td>E-001</td></tr>
-<tr><td>⑩</td><td>客服</td><td>受理客户询问</td><td>执行</td><td>工单系统</td><td>转结算</td><td>E-011</td></tr>
-<tr><td>⑪</td><td>客户</td><td>7 日内提异议 / 默认确认</td><td>判断（客户侧）</td><td>邮件</td><td>异议或默认</td><td>E-001</td></tr>
+<tr><td>⑩</td><td>客户</td><td>7 日内是否提异议（P4）</td><td><strong>判断（客户侧）</strong></td><td>邮件 + 合同 §7.2</td><td>是→转客服；否→收款</td><td>E-001</td></tr>
+<tr><td>⑪</td><td>客服</td><td>受理异议·转结算</td><td>执行</td><td>工单系统</td><td>转结算 / 单据追溯</td><td>E-011</td></tr>
+<tr><td>P5</td><td>经理</td><td>是否补收 / 减免</td><td><strong>判断（商务）</strong></td><td>单据 + 合同</td><td>补收 / 减免 / 放弃</td><td>E-001</td></tr>
 <tr><td>⑫</td><td>财务</td><td>收款核销</td><td>执行</td><td>用友 U8</td><td>核销单</td><td>E-019</td></tr>
 <tr><td>⑬</td><td>财务</td><td>月结对账，差异挂"待查"</td><td>执行</td><td>财务系统</td><td>待查挂账 ¥120 万</td><td>E-013</td></tr>
 </table>
@@ -544,10 +527,10 @@ hr { border: 0; border-top: 1px solid #d8e4f0; margin: 12pt 0; }
 <tr><td>P1 新客户/新航线</td><td>单证 + 经理</td><td>经验 + 合同</td><td>可以（按客户号/航线白名单）</td><td>可交给规则引擎，人只审例外</td></tr>
 <tr><td>P2 账单与预估是否一致</td><td>单证</td><td>人眼比对</td><td><strong>可以，且必须系统化</strong></td><td>交给系统逐行比对，人只看差异</td></tr>
 <tr><td>P3 合同是否含该费用项</td><td>结算</td><td>翻 PDF + 记忆</td><td>部分可以（条款类型化后）</td><td>先做 Top 40 客户结构化，其余人工</td></tr>
-<tr><td>P4 是否补收/减免</td><td>经理</td><td>商务判断</td><td><strong>不可以</strong></td><td>必须留给人（许安红线 RL-5）</td></tr>
-<tr><td>P5 客户异议是否成立</td><td>客服 + 结算</td><td>单据 + 合同</td><td>部分可以（有单据即成立）</td><td>系统给证据包，结论留给人</td></tr>
+<tr><td>P4 客户异议是否成立</td><td>客服 + 结算</td><td>单据 + 合同</td><td>部分可以（有单据即成立）</td><td>系统给证据包，结论留给人</td></tr>
+<tr><td>P5 是否补收/减免</td><td>经理（赵磊）</td><td>商务判断</td><td><strong>不可以</strong></td><td>必须留给人（许安红线 RL-5）</td></tr>
 </table>
-<blockquote>这张表是 Stage 03 需求边界与 Stage 05 智能体分工的直接依据：<strong>P2 全自动比对、P1/P3 机器建议人确认、P4 完全留给人。</strong></blockquote>
+<blockquote>这张表是 Stage 03 需求边界与 Stage 05 智能体分工的直接依据：<strong>P2 全自动比对、P1/P3 机器建议人确认、P5 完全留给人。</strong></blockquote>
 <h3>2.4 流程层面的三个结构性缺陷</h3>
 <ol>
 <li><strong>信息落地失败 ×3</strong>：邮件附加费→应收项（无载体）、费率卡更新→版本（无字段）、账单生成→校验（无环节）。</li>
