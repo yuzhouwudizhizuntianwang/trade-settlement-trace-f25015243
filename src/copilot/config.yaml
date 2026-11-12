@@ -1,0 +1,83 @@
+# ============================================================================
+# 结算复核助手 · 全局配置
+# 规则：代码里不许出现任何密钥、模型地址、Harness 端点；只能从这里或环境变量读
+# 密钥类字段统一写成 ${ENV_NAME}，由 app/core/config.py 在启动时从环境变量注入
+# ============================================================================
+
+app:
+  name: "settlement-copilot"        # 服务名，出现在 /health 与日志里
+  env: "dev"                        # dev / prod；prod 会强制校验密钥是否已注入
+  host: "127.0.0.1"                 # 只监听本机，课设演示不需要公网暴露
+  port: 8000                        # 本地端口；被占用时改这里，不要改代码
+
+auth:
+  jwt_secret: "${COPILOT_JWT_SECRET}"   # 必须由环境变量提供，禁止写死
+  algorithm: "HS256"                    # 单机演示用 HS256 足够；换成 RS256 只需改这里
+  expire_minutes: 120                   # 令牌有效期；课设演示 2 小时够用
+  # 演示账号：Phase 1 先放配置里，Phase 2 迁到 users 表（注释保留，方便对上）
+  demo_users:
+    - username: "chenlili"              # 结算专员：可看价格，但只能看自己负责的客户
+      password: "${COPILOT_DEMO_PWD}"   # 明文口令只从环境变量取，不落配置文件
+      role: "settler"                   # 角色：settler=结算专员
+      customer_scope: ["C-0731"]        # 数据范围：只允许访问这些客户号的单据
+    - username: "zhangwei"              # 单证操作员：看不到毛利与单价
+      password: "${COPILOT_DEMO_PWD}"
+      role: "operator"                  # 角色：operator=单证操作员
+      customer_scope: ["C-0731"]
+    - username: "zhouhui"               # 复核人：可审批补收/减免、可导出（留痕）
+      password: "${COPILOT_DEMO_PWD}"
+      role: "reviewer"                  # 角色：reviewer=复核人
+      customer_scope: ["*"]             # * 表示全量客户
+    - username: "xuan"                  # 合规/审计：只读日志与导出记录
+      password: "${COPILOT_DEMO_PWD}"
+      role: "auditor"                   # 角色：auditor=只读审计
+      customer_scope: ["*"]
+
+llm:
+  # provider: rules=本地规则生成（不装模型，结论与模型同结构，措辞朴素）
+  #           ollama=本地 Ollama（老师要求）；vllm=生产；mock=单测哑桩
+  #           切换只改这一行，代码与接口完全不动
+  provider: "rules"
+  base_url: "${COPILOT_LLM_BASE_URL}"    # 开发期 Ollama（http://127.0.0.1:11434/v1），生产切 vLLM，只改这里
+  model: "qwen2.5:7b"                   # 本地模型名；不许在代码里写死
+  api_key: "${COPILOT_LLM_API_KEY}"     # Ollama 可留空，但字段必须存在，便于切云
+  timeout_seconds: 30                   # 超时必须有；断网时不能让页面转圈
+  max_retries: 1                        # 只重试一次，避免把断网放大成雪崩
+
+knowledge:
+  provider: "harness"                   # harness=课程平台云端知识库；local=本地兜底（离线演示）
+  harness:
+    endpoint: "${COPILOT_HARNESS_ENDPOINT}"   # Harness 知识库服务地址（课程平台控制台里取）
+    api_key: "${COPILOT_HARNESS_API_KEY}"     # 知识库 API Key，只从环境变量注入
+    kb_id: "${COPILOT_HARNESS_KB_ID}"         # 知识库 ID
+    timeout_seconds: 15
+    top_k: 6                                  # 检索条数；制度条款类问题 6 条够用
+  local:
+    dir: "data/kb"                    # 本地兜底：把制度条款、费率规则导出成 md 放这里
+    index_file: "data/kb/index.json"  # 简易倒排索引路径（Phase 3 用 FAISS 替换实现，不改调用方）
+
+redline:
+  # 出网字段白名单：只有列在这里的字段允许发给外部模型，其余一律拦截
+  outbound_allow_fields:
+    - "fee_code"        # 费用代码（LSS/PSS/THC 这类，不含金额）
+    - "fee_name"        # 费用名称
+    - "status"          # 状态（应收未收/已收/争议）
+    - "doc_type"        # 单据类型
+  # 命中即拦截的敏感字段名（大小写不敏感，含中文别名）
+  outbound_deny_fields:
+    - "unit_price"      # 单价
+    - "price"           # 价格
+    - "amount"          # 金额
+    - "gross_margin"    # 毛利
+    - "margin"          # 利润率
+    - "rate"            # 费率
+    - "单价"
+    - "金额"
+    - "毛利"
+    - "费率"
+  # 导出与发送的审批阈值（元）：超过就必须复核人二次确认
+  approval_threshold_cny: 500
+
+audit:
+  log_file: "data/audit.jsonl"        # 审计日志落文件；Phase 2 再迁到数据库（保留双写）
+  retention_years: 3                  # 制度要求 3 年，写死在配置里，代码里不许改小

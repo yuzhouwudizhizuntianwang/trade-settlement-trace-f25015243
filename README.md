@@ -42,6 +42,9 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 │   ├── 04-项目原有资料/               ← 成品 ④：原始资料 4 份（M-01~M-04）
 │   ├── 05_现状流程图_…_姚晔.png       ← 成品 ⑤：现状流程图（PNG + SVG）
 │   ├── 05_现状流程图_…_姚晔.svg
+│   ├── 技术方案.md / 技术方案.docx     ← 智能体系统技术方案（含知识图谱）
+│   ├── 技术案例.md                    ← BK2610-0187 端到端走查
+│   ├── 提示词.md                      ← 6 组提示词 + 兜底话术
 │   ├── 00-overview.md                 # 过程件：项目概览、四来源结论
 │   ├── 01-opportunity-list.md         # 过程件：01-1 业务机会清单
 │   ├── 02-baseline-metrics.md         # 过程件：01-2 指标基线与价值假设
@@ -53,6 +56,12 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 ├── submit/                    # 提交平台的副本（文件名带班级/学号/姓名，与 docs/ 原件一致）
 ├── src/                       # 代码（阶段 05 落地，现为数据契约占位）
 │   ├── README.md
+│   ├── copilot/                       # 结算复核助手 Phase 1 骨架（可跑，24 项单测）
+│   │   ├── app/core/{config,response,redline,security,llm}.py
+│   │   ├── app/main.py                # /health /auth/login /auth/me /redline/preview /llm/ping
+│   │   ├── config.yaml                # 六节配置，密钥走 ${ENV}
+│   │   ├── tests/test_core_logic.py   # 24 条单测
+│   │   └── verify.sh                  # 端到端验证（14 项断言）
 │   └── settlement/
 │       ├── __init__.py
 │       └── models.py                  # 单票/费用行/费率卡/追溯链 数据契约
@@ -88,7 +97,21 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 5. 交付物索引
+## 5. 智能体系统交付物（结算复核助手）
+
+| 文件 | 内容 | 状态 |
+|---|---|---|
+| `docs/技术方案.md` / `.docx` | 架构、选型理由、数据模型、**知识图谱 Schema**、红线实现、接口清单、里程碑 | ✅ |
+| `docs/技术案例.md` | BK2610-0187 端到端走查（图谱 2 跳 → 差异 → 追溯链 → 人工确认） | ✅ |
+| `docs/提示词.md` | 系统提示词 / 工具定义 / 检索改写 / 图谱抽取 / 差异归因 / 草稿生成 + 6 条兜底话术 | ✅ |
+| `src/copilot/` | Phase 1 可运行骨架（24 项单测通过） | ✅ |
+
+**模型后端**：默认 `provider: rules`（零依赖本地规则生成，不装 Ollama 也能出同结构结论）；
+装了 Ollama 改一行 `provider: ollama` 即切换，代码不动。
+
+---
+
+## 6. 交付物索引
 
 | 阶段 | 任务 | 交付物 | 过程件 | 成品报告（`docs/`） |
 |---|---|---|---|---|
@@ -108,7 +131,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 6. 核心指标：基线 → 目标
+## 7. 核心指标：基线 → 目标
 
 | 指标 | 口径（起点→终点） | 基线（2026 Q3） | 目标 | 数据来源 |
 |---|---|---|---|---|
@@ -123,7 +146,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 7. 编号约定（跨文档唯一）
+## 8. 编号约定（跨文档唯一）
 
 | 前缀 | 含义 | 示例 | 维护位置 |
 |---|---|---|---|
@@ -138,7 +161,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 8. 怎么读这个仓库
+## 9. 怎么读这个仓库
 
 1. 只想看结论 → `docs/00-overview.md`（含四来源收敛结论与 7 项待核实）
 2. 要评审阶段 01 → `docs/01_业务挖掘报告_*.md` + `docs/09-stage-gates.md`
@@ -147,7 +170,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 9. 边界声明
+## 10. 边界声明
 
 - 本项目 **不含** 真实客户数据。所有企业名、人名、金额、单号均为实训场景构造，口径与方法遵循真实 FDE 流程。
 - `docs/` 中所有"原话"来自实训角色访谈记录，金额与单号已做脱敏替换。
@@ -155,6 +178,6 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 10. License
+## 11. License
 
 MIT © 2026 海川服贸 FDE 实训小组

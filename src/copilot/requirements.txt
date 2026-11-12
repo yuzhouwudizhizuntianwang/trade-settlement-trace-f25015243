@@ -1,0 +1,14 @@
+# Phase 1 运行依赖（Python 3.11）
+# 版本用下限约束，不锁死小版本：课设换台机器安装成功率高一点
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.6
+PyYAML>=6.0
+
+# ---- 以下为后续阶段要用，Phase 1 先装上不影响运行 ----
+# SQLAlchemy>=2.0        # Phase 2：单据/费用行/费率卡/审计日志建表
+# httpx>=0.27            # Phase 3：调用 Harness 知识库 HTTP API
+# numpy>=1.26            # Phase 3：FAISS 检索的向量底座
+# faiss-cpu>=1.7         # Phase 3：本地向量检索（Harness 不可用时兜底）
+# sentence-transformers>=2.6   # Phase 3：BGE 中文向量模型
+# openai>=1.30           # Phase 4：对接 Ollama / vLLM 的 OpenAI 兼容接口
