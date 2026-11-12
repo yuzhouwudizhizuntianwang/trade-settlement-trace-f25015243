@@ -128,7 +128,8 @@ class LLMClient:
     """
 
     def __init__(self, provider: str, base_url: str, model: str,
-                 api_key: str = "", timeout: int = 30, max_retries: int = 1):
+                 api_key: str = "", timeout: int = 30, max_retries: int = 1,
+                 fallback: str = "rules"):
         """构造客户端。
 
         入参：
@@ -138,6 +139,7 @@ class LLMClient:
             api_key     —— 本地模型通常为空，字段保留便于切云
             timeout     —— 单次请求秒数，必须有（断网不能让页面转圈）
             max_retries —— 重试次数，默认 1，避免把断网放大成雪崩
+            fallback    —— 模型不可达时的降级后端：rules（本地规则）/ none（直接抛错）
         出参：无
         失败行为：provider 不在白名单内抛 ValueError（启动即失败，不静默降级）。
         """
@@ -150,6 +152,10 @@ class LLMClient:
         self.api_key = api_key
         self.timeout = timeout
         self.max_retries = max_retries
+        # 降级策略：主路径永远是 Ollama；模型没起来时用本地规则兜底，并在输出里明确标注，
+        # 保证"结论照出、来源可选"，而不是整站 500。
+        self.fallback = fallback if fallback in {"rules", "none"} else "rules"
+        self.last_mode = "unknown"      # 最近一次调用实际走的路径：ollama / rules
 
     # ------------------------------------------------------------------ 对外
     def chat(self, messages: list[dict], temperature: float = 0.2) -> str:
@@ -177,12 +183,20 @@ class LLMClient:
         last_error = None
         for attempt in range(self.max_retries + 1):       # 0..max_retries
             try:
-                return self._post("/chat/completions", payload)
+                text = self._post("/chat/completions", payload)
+                self.last_mode = self.provider            # 真实模型返回
+                return text
             except LLMError as exc:
                 last_error = exc
                 if not exc.retryable or attempt >= self.max_retries:
                     break
                 time.sleep(0.5 * (attempt + 1))          # 线性退避，别做指数把课上时间耗光
+
+        # 走到这里说明 Ollama 不可用：按配置降级
+        if self.fallback == "rules":
+            self.last_mode = "rules"
+            body = RuleRenderer().render(messages)
+            return body + f"\n[降级说明] Ollama 不可达（{last_error}），本次结论由本地规则生成。"
         raise last_error or LLMError("模型调用失败")
 
     def health(self) -> dict:
@@ -194,9 +208,11 @@ class LLMClient:
         """
         if self.provider == "rules":
             return {"provider": "rules", "model": "rule-renderer", "reachable": True,
-                    "detail": "本地规则生成，未加载任何模型（效果等价：结论来自确定性引擎）"}
+                    "mode": "rules", "fallback": self.fallback,
+                    "detail": "本地规则生成，未加载任何模型（结论来自确定性引擎）"}
         if self.provider == "mock":
             return {"provider": "mock", "model": "stub", "reachable": True,
+                    "mode": "mock", "fallback": self.fallback,
                     "detail": "离线桩，未调用任何模型"}
         try:
             self._post("/chat/completions", {
@@ -206,10 +222,13 @@ class LLMClient:
                 "stream": False,
             })
             return {"provider": self.provider, "model": self.model, "reachable": True,
-                    "detail": "连接正常"}
+                    "mode": self.provider, "fallback": self.fallback,
+                    "detail": "Ollama 连接正常，全部推理在本机完成"}
         except LLMError as exc:
             return {"provider": self.provider, "model": self.model, "reachable": False,
-                    "detail": str(exc)}
+                    "mode": "rules" if self.fallback == "rules" else "unavailable",
+                    "fallback": self.fallback,
+                    "detail": f"Ollama 不可达：{exc}；已按 fallback={self.fallback} 处理"}
 
     # ------------------------------------------------------------------ 内部
     def _post(self, path: str, payload: dict) -> str:

@@ -206,6 +206,22 @@ class TestLLM(unittest.TestCase):
         self.assertIn("缺失", out)
         self.assertIn("断链位置：第 3 级", out)
 
+    def test_ollama_fallback_to_rules(self):
+        """Ollama 不可达时必须降级并在输出里标注，不能静默冒充模型结论。"""
+        client = LLMClient("ollama", "http://127.0.0.1:9/v1", "qwen2.5:7b",
+                           timeout=1, max_retries=0, fallback="rules")
+        out = client.chat([{"role": "user", "content": "看差异"}])
+        self.assertIn("降级说明", out)
+        self.assertIn("本地规则生成", out)
+        self.assertEqual(client.last_mode, "rules")
+
+    def test_ollama_no_fallback_raises(self):
+        """配置 fallback=none 时必须抛错，让调用方感知故障。"""
+        client = LLMClient("ollama", "http://127.0.0.1:9/v1", "qwen2.5:7b",
+                           timeout=1, max_retries=0, fallback="none")
+        with self.assertRaises(Exception):
+            client.chat([{"role": "user", "content": "看差异"}])
+
     def test_invalid_provider(self):
         """未支持的 provider 必须在构造时失败，不能静默降级。"""
         with self.assertRaises(ValueError):

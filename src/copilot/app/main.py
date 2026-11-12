@@ -34,6 +34,7 @@ LLM = LLMClient(                                                # 模型客户�
     api_key=SETTINGS.get("llm.api_key", ""),
     timeout=int(SETTINGS.get("llm.timeout_seconds", 30)),
     max_retries=int(SETTINGS.get("llm.max_retries", 1)),
+    fallback=str(SETTINGS.get("llm.fallback", "rules")),
 )
 OUTBOUND = OutboundFilter(                                       # 出网过滤器全局只造一个
     allow_fields=SETTINGS.get("redline.outbound_allow_fields", []),
@@ -203,3 +204,29 @@ def llm_ping() -> dict:
         探活接口必须能"报告故障"，而不是自己也挂掉。
     """
     return ok(LLM.health())
+
+
+@app.post("/llm/demo")
+def llm_demo() -> dict:
+    """演示一次完整的"取数 → 生成结论"调用，用于验证模型链路通不通。
+
+    入参：无（内部用一段固定样例，避免把真实客户数据塞进请求）
+    出参：统一结构，data = {"text": 生成内容, "mode": ollama/rules, "provider": ...}
+    失败行为：
+        Ollama 不可达且 fallback=none 时返回 503；fallback=rules 时正常返回，
+        并在 text 里明确写"本次由本地规则生成"，不冒充模型输出。
+    """
+    sample = (
+        "请解释这票的应收差异。[[DATA]]"
+        '{"differences":[{"kind":"缺项","fee_code":"LSS","fee_name":"低硫附加费",'
+        '"amount":"1180.00","currency":"CNY","evidence":"HC-FIN-2024-07 §5.2"}],'
+        '"summary":"共发现 1 项差异："}[[/DATA]]'
+    )
+    try:
+        text = LLM.chat([{"role": "system", "content": "你是结算复核助手。"},
+                         {"role": "user", "content": sample}])
+    except Exception as exc:                              # noqa: BLE001 模型异常统一转 503
+        return JSONResponse(status_code=503,
+                            content=fail("LLM_UNAVAILABLE", f"模型不可用：{exc}"))
+    return ok({"text": text, "mode": getattr(LLM, "last_mode", "unknown"),
+               "provider": SETTINGS.get("llm.provider"), "model": SETTINGS.get("llm.model")})

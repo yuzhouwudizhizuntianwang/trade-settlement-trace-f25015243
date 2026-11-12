@@ -34,12 +34,13 @@ auth:
       customer_scope: ["*"]
 
 llm:
-  # provider: rules=本地规则生成（不装模型，结论与模型同结构，措辞朴素）
-  #           ollama=本地 Ollama（老师要求）；vllm=生产；mock=单测哑桩
-  #           切换只改这一行，代码与接口完全不动
-  provider: "rules"
+  # 主后端固定为 ollama：全部推理在本机完成，不调用任何外网 API
+  # provider: ollama=本地 Ollama（默认）；rules=本地规则生成（无模型时可选）；mock=单测哑桩
+  provider: "ollama"
+  # 模型不可达时的降级策略：rules=本地规则照出结论并标注；none=直接报错
+  fallback: "rules"
   base_url: "${COPILOT_LLM_BASE_URL}"    # 开发期 Ollama（http://127.0.0.1:11434/v1），生产切 vLLM，只改这里
-  model: "qwen2.5:7b"                   # 本地模型名；不许在代码里写死
+  model: "qwen2.5:7b"                   # 本地模型名（显存小可改 qwen2.5:3b / 0.5b）
   api_key: "${COPILOT_LLM_API_KEY}"     # Ollama 可留空，但字段必须存在，便于切云
   timeout_seconds: 30                   # 超时必须有；断网时不能让页面转圈
   max_retries: 1                        # 只重试一次，避免把断网放大成雪崩

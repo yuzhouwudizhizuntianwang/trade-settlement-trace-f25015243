@@ -104,10 +104,11 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 | `docs/技术方案.md` / `.docx` | 架构、选型理由、数据模型、**知识图谱 Schema**、红线实现、接口清单、里程碑 | ✅ |
 | `docs/技术案例.md` | BK2610-0187 端到端走查（图谱 2 跳 → 差异 → 追溯链 → 人工确认） | ✅ |
 | `docs/提示词.md` | 系统提示词 / 工具定义 / 检索改写 / 图谱抽取 / 差异归因 / 草稿生成 + 6 条兜底话术 | ✅ |
-| `src/copilot/` | Phase 1 可运行骨架（24 项单测通过） | ✅ |
+| `src/copilot/` | Phase 1 可运行骨架（26 项单测通过）+ `ollama/Modelfile` + 一键部署脚本 | ✅ |
 
-**模型后端**：默认 `provider: rules`（零依赖本地规则生成，不装 Ollama 也能出同结构结论）；
-装了 Ollama 改一行 `provider: ollama` 即切换，代码不动。
+**模型后端**：`provider: ollama`（`127.0.0.1:11434`，唯一主后端，不接任何外网大模型 API）；
+系统提示词固化在 `src/copilot/ollama/Modelfile`，`scripts/setup_ollama.ps1` 一键部署；
+未启动 Ollama 时按 `llm.fallback=rules` 降级为本地规则生成，并在输出中标注。
 
 ---
 

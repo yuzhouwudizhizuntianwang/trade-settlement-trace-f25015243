@@ -49,10 +49,17 @@ HEALTH=$(curl -s "$BASE/health")
 check "ok 字段为 true"      "$(echo "$HEALTH" | jget "['ok']")" "True"
 check "服务名正确"          "$(echo "$HEALTH" | jget "['data']['service']")" "settlement-copilot"
 
-echo "== 2.5 模型探活（provider=rules 时无需装 Ollama）=="
+echo "== 2.5 模型探活（主后端 Ollama，未装时自动降级）=="
 LLM=$(curl -s "$BASE/llm/ping")
-check "模型可达"            "$(echo "$LLM" | jget "['data']['reachable']")" "True"
-check "当前为本地规则生成"  "$(echo "$LLM" | jget "['data']['provider']")" "rules"
+check "后端为 ollama"       "$(echo "$LLM" | jget "['data']['provider']")" "ollama"
+REACH=$(echo "$LLM" | jget "['data']['reachable']")
+if [ "$REACH" = "True" ]; then
+  echo "  ✅ Ollama 可达，走真模型推理"
+else
+  echo "  ⚠️  本机未运行 Ollama，已降级为本地规则生成（结论结构一致，措辞朴素）"
+fi
+DEMO=$(curl -s -X POST "$BASE/llm/demo")
+check "演示接口可用"        "$(echo "$DEMO" | jget "['ok']")" "True"
 
 echo "== 3. /auth/login 鉴权 =="
 LOGIN=$(curl -s -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
