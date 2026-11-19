@@ -4,7 +4,7 @@ fastapi>=0.110
 uvicorn[standard]>=0.27
 pydantic>=2.6
 PyYAML>=6.0
-SQLAlchemy>=2.0        # P0：建表 + SQLite/MySQL 一套代码
+SQLAlchemy>=2.0
 
 # ---- 以下为后续阶段要用，Phase 1 先装上不影响运行 ----
 # httpx>=0.27            # Phase 3：调用 Harness 知识库 HTTP API

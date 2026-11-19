@@ -117,18 +117,32 @@ def _unauthorized(code: str, msg: str) -> JSONResponse:
     return JSONResponse(status_code=401, content=fail(code, msg))
 
 
-def current_user(authorization: str = Header(default="")) -> dict:
-    """从 Authorization 头解出当前用户（FastAPI 依赖）。
+def current_user(authorization: str = Header(default=""),
+                 x_copilot_token: str = Header(default="")) -> dict:
+    """从请求头解出当前用户（FastAPI 依赖）。
 
-    入参：authorization —— 形如 "Bearer xxx.yyy.zzz"
+    入参：
+        authorization  —— 标准头，形如 "Bearer xxx.yyy.zzz"
+        x_copilot_token —— 备用头，纯令牌，无 Bearer 前缀
     出参：令牌 claims（含 sub / role / scope / abilities）
     失败行为：
         缺头、格式错、签名错、过期——一律抛 HTTPException(401)。
-        注意：这里绝不读取请求体里的 username/role，身份只能来自我们签发的令牌。
+        注意：绝不读取请求体里的 username/role，身份只能来自我们签发的令牌。
+
+    为什么要有备用头：托管平台的分享网关会注入它自己的 Authorization 头，
+    把我们带的值覆盖掉（表现为"无论带不带令牌都报签名失败"）。
+    X-Copilot-Token 不在网关的注入名单里，因此能原样到达应用。
+    这仍然满足"身份只从 JWT 取"——换的只是传输通道，令牌本身没变。
     """
-    if not authorization.startswith("Bearer "):                  # 必须带 Bearer 前缀
-        raise HTTPException(status_code=401, detail="缺少 Bearer 令牌")
-    token = authorization[len("Bearer "):].strip()
+    token = ""
+    # 顺序很关键：先看自定义头。托管网关会往每个请求注入它自己的 Authorization，
+    # 若先读 Authorization，我们自己的令牌就永远被顶掉（实测表现：带什么令牌都"签名校验失败"）。
+    if x_copilot_token.strip():
+        token = x_copilot_token.strip()
+    elif authorization.startswith("Bearer "):
+        token = authorization[len("Bearer "):].strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="缺少令牌")
     try:
         claims = verify_token(token, SETTINGS.get("auth.jwt_secret", ""))
     except TokenError as exc:                                    # 统一转 401，不泄漏内部细节
