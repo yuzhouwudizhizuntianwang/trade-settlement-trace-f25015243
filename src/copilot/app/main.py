@@ -309,6 +309,28 @@ def llm_demo() -> dict:
 # 全部要求登录：身份只从 JWT 取，不接受请求参数自报身份（红线 6）
 # ============================================================================
 
+@app.get("/index.html", response_class=HTMLResponse)
+def index_html() -> HTMLResponse:
+    """兼容 /index.html 访问（托管网关有时会把根路径改写成 index.html）。
+
+    入参：无
+    出参：与 "/" 相同的页面
+    失败行为：同 index()。
+    """
+    return index()
+
+
+@app.get("/favicon.ico")
+def favicon() -> JSONResponse:
+    """返回空 favicon，避免浏览器 404 噪声干扰日志。
+
+    入参：无
+    出参：204 空响应
+    失败行为：不抛异常。
+    """
+    return JSONResponse(status_code=204, content=None)
+
+
 @app.get("/", response_class=HTMLResponse)
 def index() -> HTMLResponse:
     """返回演示页面（原生 HTML + 原生 JS，无构建步骤）。
