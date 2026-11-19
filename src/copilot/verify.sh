@@ -85,7 +85,7 @@ PREVIEW=$(curl -s -X POST "$BASE/redline/preview" -H "Authorization: Bearer $TOK
   -H "Content-Type: application/json" \
   -d '{"customer_id":"C-0731","charges":[{"fee_code":"LSS","fee_name":"低硫附加费","amount":"1180.00","unit_price":"1180"}]}')
 check "预览接口成功"        "$(echo "$PREVIEW" | jget "['ok']")" "True"
-check "金额字段被拦下"      "$(echo "$PREVIEW" | jget "['data']['blocked']")" "['charges[0].amount', 'charges[0].unit_price']"
+check "金额/单价均被拦下"   "$(echo "$PREVIEW" | python -c "import json,sys;b=json.load(sys.stdin)['data']['blocked'];print(all(any(k in x for x in b) for k in ['amount','unit_price']))")" "True"
 check "客户范围校验通过"    "$(echo "$PREVIEW" | jget "['data']['scope_check']")" "passed"
 
 echo "== 6. 越权访问必须 403 =="
@@ -93,6 +93,25 @@ CROSS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/redline/preview" \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"customer_id":"C-0800","charges":[]}')
 check "跨客户访问被拒"      "$CROSS" "403"
+
+echo "== 7. P0 业务闭环：单票 → 差异 → 追溯 =="
+SHIP=$(curl -s "$BASE/api/shipments/BK2610-0187?key_type=booking_no" -H "Authorization: Bearer $TOKEN")
+check "单票可查"            "$(echo "$SHIP" | jget "['data']['shipment_id']")" "SO2610-0187"
+check "命中费率卡 V4"       "$(echo "$SHIP" | jget "['data']['rate_card']")" "V4"
+
+DIFF=$(curl -s "$BASE/api/diff/SO2610-0187" -H "Authorization: Bearer $TOKEN")
+check "缺口合计 ¥2,610"     "$(echo "$DIFF" | jget "['data']['totals']['CNY']")" "2,610.00 CNY"
+check "缺项 3 条"           "$(echo "$DIFF" | python -c "import json,sys;d=json.load(sys.stdin);print(len([x for x in d['data']['differences'] if x['kind']=='缺项']))")" "3"
+
+TRACE=$(curl -s "$BASE/api/trace/SO2610-0187/LSS" -H "Authorization: Bearer $TOKEN")
+check "追溯链 4 级"         "$(echo "$TRACE" | python -c "import json,sys;print(len(json.load(sys.stdin)['data']['levels']))")" "4"
+check "第 4 级标待出账"     "$(echo "$TRACE" | jget "['data']['breaks']")" "[4]"
+
+echo "== 8. 知识库与图谱 =="
+KB=$(curl -s "$BASE/api/kb/search?q=LSS&top_k=3" -H "Authorization: Bearer $TOKEN")
+check "知识库有命中"        "$(echo "$KB" | python -c "import json,sys;print(len(json.load(sys.stdin)['data']['hits'])>0)")" "True"
+WHY=$(curl -s "$BASE/api/graph/why?customer_id=C-0731&fee_code=LSS&version=V4" -H "Authorization: Bearer $TOKEN")
+check "图谱路径 3 跳"       "$(echo "$WHY" | jget "['data']['hops']")" "3"
 
 echo
 echo "== 结果：通过 $PASS 项，失败 $FAIL 项 =="

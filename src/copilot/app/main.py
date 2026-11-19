@@ -8,14 +8,22 @@ Phase 1 只保证三件事能跑通：
 业务查询（费用归集、差异比对、追溯链）留到 Phase 2，避免骨架还没稳就堆业务。
 """
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, Header, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
 from app.core.config import get_settings
 from app.core.llm import LLMClient
 from app.core.redline import OutboundFilter, RedlineViolation
 from app.core.response import fail, ok
+from app.repo import get_repository
+from app.services.collect import build_view, get_shipment
+from app.services.diff import compute_diff
+from app.services.graph import expand, why_applicable
+from app.services.kb import build_knowledge_provider
+from app.services.rate import RateCardMissing
 from app.core.security import (
     TokenError,
     abilities,
@@ -24,9 +32,13 @@ from app.core.security import (
     verify_token,
 )
 
-app = FastAPI(title="结算复核助手 · settlement-copilot", version="0.1.0-phase1")
+app = FastAPI(title="结算复核助手 · settlement-copilot", version="0.2.0-p0")
+
+# 启动时构建数据仓库与知识库：SQLite 优先，缺依赖自动降级为内存演示库（stderr 会提示）
+REPO = get_repository()
 
 SETTINGS = get_settings()                                        # 启动即读配置（缺失就崩，见 config.py）
+KB = build_knowledge_provider(SETTINGS)                          # Harness 优先，失败降级本地镜像
 LLM = LLMClient(                                                # 模型客户端：provider=mock 时离线可用
     provider=SETTINGS.get("llm.provider", "mock"),
     base_url=SETTINGS.get("llm.base_url", ""),
@@ -230,3 +242,141 @@ def llm_demo() -> dict:
                             content=fail("LLM_UNAVAILABLE", f"模型不可用：{exc}"))
     return ok({"text": text, "mode": getattr(LLM, "last_mode", "unknown"),
                "provider": SETTINGS.get("llm.provider"), "model": SETTINGS.get("llm.model")})
+
+
+# ============================================================================
+# P0 业务接口（单票 → 差异 → 追溯 → 知识库 → 图谱）
+# 全部要求登录：身份只从 JWT 取，不接受请求参数自报身份（红线 6）
+# ============================================================================
+
+@app.get("/", response_class=HTMLResponse)
+def index() -> HTMLResponse:
+    """返回演示页面（原生 HTML + 原生 JS，无构建步骤）。
+
+    入参：无
+    出参：index.html 内容
+    失败行为：文件缺失时返回一段说明文字而不是 500。
+    """
+    path = Path("web/index.html")
+    if not path.exists():
+        return HTMLResponse("<h1>web/index.html 不存在</h1>", status_code=500)
+    return HTMLResponse(path.read_text(encoding="utf-8"))
+
+
+@app.get("/api/shipments/{key_value}")
+def api_shipment(key_value: str, key_type: str = "booking_no",
+                 user: dict = Depends(current_user)) -> JSONResponse:
+    """按四键之一取单票视图（费用行 + 应有费用 + 费率卡）。
+
+    入参：
+        key_value —— 键值，如 BK2610-0187
+        key_type  —— order_no / booking_no / bl_no / container_no（默认订舱号）
+    出参：统一结构，data 为 build_view() 结果
+    失败行为：
+        查不到返回 404；key_type 非法返回 400；跨客户访问返回 403（scope 校验）。
+    """
+    try:
+        shipment = get_shipment(REPO, key_type, key_value)
+    except ValueError as exc:
+        return JSONResponse(status_code=400, content=fail("BAD_KEY_TYPE", str(exc)))
+    if not shipment:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"未找到 {key_type}={key_value}"))
+    try:
+        assert_customer_allowed(user.get("scope", []), shipment.customer_id)   # 数据隔离
+    except PermissionError as exc:
+        return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
+    return JSONResponse(status_code=200, content=ok(build_view(REPO, shipment)))
+
+
+@app.get("/api/diff/{shipment_id}")
+def api_diff(shipment_id: str, user: dict = Depends(current_user)) -> JSONResponse:
+    """计算一票的差异清单（缺项/重复/金额不符/未匹配）。
+
+    入参：shipment_id —— 单票号（演示数据里等于订单号）
+    出参：统一结构，data 见 compute_diff()
+    失败行为：
+        查不到 404；缺费率卡返回 409 并给出原因（阻断出账，不给默认值）；越权 403。
+    """
+    shipment = get_shipment(REPO, "order_no", shipment_id)
+    if not shipment:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"未找到单票 {shipment_id}"))
+    try:
+        assert_customer_allowed(user.get("scope", []), shipment.customer_id)
+    except PermissionError as exc:
+        return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
+    try:
+        return JSONResponse(status_code=200, content=ok(compute_diff(REPO, shipment)))
+    except RateCardMissing as exc:
+        return JSONResponse(status_code=409, content=fail("RATE_CARD_MISSING", str(exc)))
+
+
+@app.get("/api/trace/{shipment_id}/{fee_code}")
+def api_trace(shipment_id: str, fee_code: str,
+              user: dict = Depends(current_user)) -> JSONResponse:
+    """取某票某个费用项的追溯链（四级，缺失标断链）。
+
+    入参：shipment_id —— 单票号；fee_code —— 费用代码，如 LSS
+    出参：统一结构，data = {"fee_code","levels":[...],"breaks":[...]}
+    失败行为：查不到单票 404；越权 403；不抛异常。
+    """
+    shipment = get_shipment(REPO, "order_no", shipment_id)
+    if not shipment:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"未找到单票 {shipment_id}"))
+    try:
+        assert_customer_allowed(user.get("scope", []), shipment.customer_id)
+    except PermissionError as exc:
+        return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
+
+    diff = compute_diff(REPO, shipment)
+    hit = next((d for d in diff["differences"] if d["fee_code"] == fee_code), None)
+    if hit:
+        levels = hit["trace"]
+    else:                                          # 无差异时也可查（例如已正确的项）
+        from app.services.trace import build_trace
+        line = next((l for l in REPO.lines_of(shipment.shipment_id) if l.fee_code == fee_code), None)
+        levels = [lv.__dict__ for lv in build_trace(
+            REPO, shipment, fee_code, diff["rate_card"], "", "", line)]
+    breaks = [lv["level"] for lv in levels if lv.get("missing")]
+    return JSONResponse(status_code=200, content=ok(
+        {"fee_code": fee_code, "levels": levels, "breaks": breaks}))
+
+
+@app.get("/api/kb/search")
+def api_kb(q: str, top_k: int = 5, user: dict = Depends(current_user)) -> JSONResponse:
+    """检索知识库（Harness 优先，失败自动降级本地镜像）。
+
+    入参：q —— 查询词；top_k —— 条数
+    出参：统一结构，data = {"provider":..., "hits":[{doc_no,clause_no,title,snippet,score,source}]}
+    失败行为：不抛异常；无命中返回空列表并在 provider 中标明后端。
+    """
+    hits = KB.search(q, top_k)
+    return JSONResponse(status_code=200, content=ok({
+        "provider": KB.name(),
+        "hits": [{"doc_no": h.doc_no, "clause_no": h.clause_no, "title": h.title,
+                  "snippet": h.snippet, "score": h.score, "source": h.source} for h in hits],
+    }))
+
+
+@app.get("/api/graph/why")
+def api_graph_why(customer_id: str, fee_code: str, version: str = "",
+                  user: dict = Depends(current_user)) -> JSONResponse:
+    """知识图谱：解释"这条费率为什么适用于这个客户"。
+
+    入参：customer_id —— 客户号；fee_code —— 费用项；version —— 期望命中的费率卡版本
+    出参：统一结构，data = {"path":[{from,predicate,to,source_ref}], "hops": 2}
+    失败行为：不抛异常；路径为空表示图谱里没有这条关系（应提示"未找到依据"）。
+    """
+    path = why_applicable(REPO, customer_id, fee_code, version)
+    return JSONResponse(status_code=200, content=ok({"path": path, "hops": len(path)}))
+
+
+@app.get("/api/graph/expand")
+def api_graph_expand(entity: str, hops: int = 2,
+                     user: dict = Depends(current_user)) -> JSONResponse:
+    """知识图谱：从实体出发 2 跳扩展，用于展示关联关系。
+
+    入参：entity —— 如 RateCard:V4；hops —— 1 或 2
+    出参：统一结构，data 见 graph.expand()
+    失败行为：不抛异常。
+    """
+    return JSONResponse(status_code=200, content=ok(expand(REPO, entity, hops)))
