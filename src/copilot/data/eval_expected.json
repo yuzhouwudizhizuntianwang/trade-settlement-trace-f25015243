@@ -1,0 +1,12 @@
+{
+  "note": "评估集：已知答案的样例。新增样本时只加 case，不改脚本。",
+  "cases": [
+    {
+      "shipment_id": "SO2610-0187",
+      "missing_codes": ["LSS", "PSS", "REB"],
+      "missing_total_cny": "2,610.00",
+      "unmatched_codes": ["OTH"],
+      "expect_rate_card": "V4"
+    }
+  ]
+}

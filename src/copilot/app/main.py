@@ -8,6 +8,7 @@ Phase 1 只保证三件事能跑通：
 业务查询（费用归集、差异比对、追溯链）留到 Phase 2，避免骨架还没稳就堆业务。
 """
 
+import json
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -25,6 +26,7 @@ from app.services.diff import compute_diff
 from app.services.graph import expand, why_applicable
 from app.services.kb import build_knowledge_provider
 from app.services.rate import RateCardMissing
+from app.services.metrics import compute as compute_metrics
 from app.services.review import ReviewError, ReviewStore
 from app.services.export import ExportViolation, build_pack
 from app.core.security import (
@@ -81,6 +83,28 @@ def require_capability(user: dict, capability: str, action: str, target: str) ->
         AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "denied", target,
                     result="denied", extra={"need": capability, "action": action})
         raise HTTPException(status_code=403, detail=f"角色 {user.get('role')} 无 {capability} 权限")
+
+
+def mask_amounts(view: dict) -> dict:
+    """把视图里的金额字段打码（供无 view_price 权限的角色使用）。
+
+    入参：view —— build_view() 的返回值
+    出参：深拷贝后的视图，金额字段替换为 "***"
+    失败行为：不抛异常；字段不存在时跳过。
+
+    为什么打码而不是隐藏行：单证要核对自己录的费用项是否存在，
+    但不需要知道金额——结构留着，数字抹掉，才是"最小必要可见"。
+    """
+    out = json.loads(json.dumps(view, ensure_ascii=False))
+    for key in ("receivable", "required"):
+        for row in out.get(key, []) or []:
+            if "amount" in row:
+                row["amount"] = "***"
+    for key in ("payable",):
+        for row in out.get(key, []) or []:
+            if "amount" in row:
+                row["amount"] = "***"
+    return out
 
 
 def _unauthorized(code: str, msg: str) -> JSONResponse:
@@ -309,8 +333,12 @@ def api_shipment(key_value: str, key_type: str = "booking_no",
         AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "denied",
                     shipment.customer_id, result="denied", extra={"reason": "scope"})
         return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
-    AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "query", shipment.shipment_id)
-    return JSONResponse(status_code=200, content=ok(build_view(REPO, shipment)))
+    view = build_view(REPO, shipment)
+    if not user.get("abilities", {}).get("view_price", False):
+        view = mask_amounts(view)          # 单证/审计：看得到结构，看不到金额
+    AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "query", shipment.shipment_id,
+                extra={"masked": not user.get("abilities", {}).get("view_price", False)})
+    return JSONResponse(status_code=200, content=ok(view))
 
 
 @app.get("/api/diff/{shipment_id}")
@@ -548,3 +576,21 @@ def api_audit_tail(n: int = 20, user: dict = Depends(current_user)) -> JSONRespo
     """
     require_capability(user, "view_audit", "audit_tail", "audit")
     return JSONResponse(status_code=200, content=ok({"records": AUDIT.tail(n)}))
+
+
+@app.get("/api/metrics")
+def api_metrics(user: dict = Depends(current_user)) -> JSONResponse:
+    """指标看板：缺口金额、演示口径漏收率、差异类型分布。
+
+    入参：无
+    出参：统一结构，data 见 services/metrics.compute()
+    失败行为：无 view_price 权限 403（指标含金额）；计算异常 500 并记审计。
+    """
+    require_capability(user, "view_price", "metrics", "global")
+    try:
+        data = compute_metrics(REPO)
+    except Exception as exc:                              # noqa: BLE001 看板异常不能静默
+        AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "metrics", "global",
+                    result="error", extra={"error": str(exc)})
+        return JSONResponse(status_code=500, content=fail("METRICS_ERROR", str(exc)))
+    return JSONResponse(status_code=200, content=ok(data))

@@ -82,6 +82,16 @@ class SqlRepository:
             row = s.scalars(stmt).first()
             return self._to_shipment(row) if row else None
 
+    def all_shipments(self) -> list[Shipment]:
+        """返回全部单票。
+
+        入参：无
+        出参：Shipment 列表
+        失败行为：不抛异常，空表返回空列表。
+        """
+        with self._session() as s:
+            return [self._to_shipment(r) for r in s.scalars(select(ShipmentRow)).all()]
+
     def lines_of(self, shipment_id: str) -> list[ChargeLine]:
         """取一票的费用行。
 

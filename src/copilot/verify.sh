@@ -152,6 +152,20 @@ check "缺接收方被拒 400"       "$NOR" "400"
 AUDIT_HAS=$(curl -s "$BASE/api/audit/tail?n=50" -H "Authorization: Bearer $REV" | python -c "import json,sys;r=json.load(sys.stdin)['data']['records'];print(any(x['action']=='export' and x.get('receiver') for x in r))")
 check "审计里有导出接收方"     "$AUDIT_HAS" "True"
 
+echo "== 12. 权限脱敏与指标看板 =="
+OPR=$(curl -s -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
+  -d "{\"username\":\"zhangwei\",\"password\":\"${COPILOT_DEMO_PWD:-Demo#2026}\"}" | jget "['data']['token']")
+OPSHIP=$(curl -s "$BASE/api/shipments/BK2610-0187?key_type=booking_no" -H "Authorization: Bearer $OPR")
+check "单证看金额被打码"       "$(echo "$OPSHIP" | jget "['data']['receivable'][0]['amount']")" "***"
+check "单证仍看得到费用项"     "$(echo "$OPSHIP" | jget "['data']['receivable'][0]['fee_code']")" "OCF"
+OPS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/shipments/BK2610-0187?key_type=booking_no")
+check "未登录查单被拒 401"     "$OPS" "401"
+
+MET=$(curl -s "$BASE/api/metrics" -H "Authorization: Bearer $TOKEN")
+check "指标：缺口金额"         "$(echo "$MET" | jget "['data']['cny']['missing']")" "2,610.00"
+check "指标：演示漏收率"       "$(echo "$MET" | jget "['data']['leak_rate_demo']")" "40.9%"
+check "指标：缺项 3 条"        "$(echo "$MET" | jget "['data']['by_kind']['缺项']")" "3"
+
 echo
 echo "== 结果：通过 $PASS 项，失败 $FAIL 项 =="
 [ "$FAIL" -eq 0 ] || { echo "详见 $LOG"; exit 1; }

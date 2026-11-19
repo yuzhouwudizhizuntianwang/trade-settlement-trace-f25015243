@@ -30,6 +30,7 @@ class Repository(Protocol):
     """数据访问协议（结构性子类型，不强制继承）。"""
 
     def shipment_by_key(self, key_type: str, key_value: str) -> Shipment | None: ...
+    def all_shipments(self) -> list[Shipment]: ...
     def lines_of(self, shipment_id: str) -> list[ChargeLine]: ...
     def rate_cards(self, customer_id: str) -> list[RateCard]: ...
     def fee_item(self, code: str) -> FeeItem | None: ...
@@ -87,6 +88,15 @@ class MemoryRepository:
             if s.keys().get(key_type) == key_value:
                 return s
         return None
+
+    def all_shipments(self) -> list[Shipment]:
+        """返回全部单票（指标看板与评估集用）。
+
+        入参：无
+        出参：Shipment 列表
+        失败行为：不抛异常，空库返回空列表。
+        """
+        return list(self._shipments.values())
 
     def lines_of(self, shipment_id: str) -> list[ChargeLine]:
         """取一票的所有费用行（应收 + 应付）。
