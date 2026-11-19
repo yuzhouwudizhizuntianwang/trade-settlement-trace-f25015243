@@ -28,4 +28,6 @@ src/copilot/.env
 # 本地 SQLite，由 seed 自动生成
 src/copilot/data/app.db
 src/copilot/.verify.log
+src/copilot/data/review.json
+src/copilot/data/audit.jsonl
 src/copilot/**/__pycache__/

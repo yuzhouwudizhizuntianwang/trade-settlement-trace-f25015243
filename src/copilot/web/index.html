@@ -102,7 +102,8 @@ async function runAll() {
     const kb   = await api("/api/kb/search?q=" + encodeURIComponent("附加费 费率卡 版本 漏收") + "&top_k=3");
     const why  = await api("/api/graph/why?customer_id=" + encodeURIComponent("C-0731") + "&fee_code=LSS&version=" + diff.rate_card);
 
-    out.innerHTML = renderShip(ship) + renderDiff(diff) + renderKb(kb) + renderGraph(why);
+    out.innerHTML = renderShip(ship) + renderDiff(diff) + renderActions(ship.shipment_id)
+                    + renderKb(kb) + renderGraph(why);
   } catch (e) {
     out.innerHTML = '<div class="card bad">' + e.message + "</div>";
   }
@@ -129,6 +130,66 @@ function renderDiff(d) {
     <table><tr><th>类型</th><th>费用项</th><th>差额</th><th>应有 → 实有</th><th>原因</th><th>依据</th></tr>${rows}</table>
     <div class="hint" style="margin-top:8px">草稿：需结算专员确认后方可出账；系统不发送任何对外内容。</div>
   </div>`;
+}
+
+// 复核与导出：全部是"人点一下"的动作，系统不会自动发送（红线 5）
+function renderActions(shipmentId) {
+  return `<div class="card">
+    <div class="row"><b>复核与导出</b><span class="hint">草稿 → 提交 → 他人审批；导出必须填接收方并留痕</span></div>
+    <div class="row" style="margin-top:8px">
+      <button onclick="doDraft('${shipmentId}')">① 生成复核草稿</button>
+      <button class="ghost" onclick="doSubmit()">② 提交复核</button>
+      <button class="ghost" onclick="doApprove('approve')">③ 审批通过（需复核人账号）</button>
+      <input id="receiver" placeholder="接收方（导出必填）" style="width:200px">
+      <button class="ghost" onclick="doExport('${shipmentId}')">导出追溯包</button>
+    </div>
+    <div id="actState" class="hint" style="margin-top:8px">尚未生成草稿</div>
+  </div>`;
+}
+
+let CASE_ID = "";
+
+async function post(path, body) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error.code + "：" + data.error.msg);
+  return data.data;
+}
+
+async function doDraft(shipmentId) {
+  try {
+    const c = await post("/api/review/draft/" + encodeURIComponent(shipmentId));
+    CASE_ID = c.case_id;
+    $("actState").innerHTML = `已生成草稿 <b>${c.case_id}</b>，冻结缺口 ${JSON.stringify(c.snapshot.totals)}`;
+  } catch (e) { $("actState").innerHTML = '<span class="bad">' + e.message + "</span>"; }
+}
+
+async function doSubmit() {
+  if (!CASE_ID) { $("actState").innerHTML = '<span class="bad">请先生成草稿</span>'; return; }
+  try {
+    const c = await post("/api/review/submit/" + CASE_ID);
+    $("actState").innerHTML = `已提交 <b>${c.case_id}</b>，状态 ${c.status}（审批人须为他人）`;
+  } catch (e) { $("actState").innerHTML = '<span class="bad">' + e.message + "</span>"; }
+}
+
+async function doApprove(decision) {
+  if (!CASE_ID) { $("actState").innerHTML = '<span class="bad">请先生成草稿</span>'; return; }
+  try {
+    const c = await post("/api/review/approve/" + CASE_ID, { decision, comment: "页面审批" });
+    $("actState").innerHTML = `审批完成：<b>${c.status}</b>，审批人 ${c.approved_by}`;
+  } catch (e) { $("actState").innerHTML = '<span class="bad">' + e.message + "（提交人不能自审）</span>"; }
+}
+
+async function doExport(shipmentId) {
+  const receiver = $("receiver").value.trim();
+  try {
+    const r = await post("/api/export/pack", { shipment_id: shipmentId, receiver });
+    $("actState").innerHTML = `已导出，审计号 <b>${r.audit_id}</b>，接收方 ${receiver}；字段白名单 ${r.fields.length} 个`;
+  } catch (e) { $("actState").innerHTML = '<span class="bad">' + e.message + "</span>"; }
 }
 
 function renderKb(k) {

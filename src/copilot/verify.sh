@@ -113,6 +113,45 @@ check "知识库有命中"        "$(echo "$KB" | python -c "import json,sys;pri
 WHY=$(curl -s "$BASE/api/graph/why?customer_id=C-0731&fee_code=LSS&version=V4" -H "Authorization: Bearer $TOKEN")
 check "图谱路径 3 跳"       "$(echo "$WHY" | jget "['data']['hops']")" "3"
 
+echo "== 9. P1 权限矩阵 =="
+AUD=$(curl -s -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
+  -d "{\"username\":\"xuan\",\"password\":\"${COPILOT_DEMO_PWD:-Demo#2026}\"}" | jget "['data']['token']")
+REV=$(curl -s -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
+  -d "{\"username\":\"zhouhui\",\"password\":\"${COPILOT_DEMO_PWD:-Demo#2026}\"}" | jget "['data']['token']")
+
+A1=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/diff/SO2610-0187" -H "Authorization: Bearer $AUD")
+check "审计员看差异被拒 403"   "$A1" "403"
+A2=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/audit/tail?n=5" -H "Authorization: Bearer $AUD")
+check "审计员可读审计日志"     "$A2" "200"
+A3=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/export/pack" -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" -d '{"shipment_id":"SO2610-0187","receiver":"王会计"}')
+check "结算专员导出被拒 403"   "$A3" "403"
+
+echo "== 10. P1 复核闸门（草稿 → 提交 → 他人审批）=="
+CASE=$(curl -s -X POST "$BASE/api/review/draft/SO2610-0187" -H "Authorization: Bearer $TOKEN")
+CID=$(echo "$CASE" | jget "['data']['case_id']")
+check "生成草稿"               "$(echo "$CASE" | jget "['data']['status']")" "draft"
+check "草稿冻结缺口金额"       "$(echo "$CASE" | jget "['data']['snapshot']['totals']['CNY']")" "2,610.00 CNY"
+check "提交复核"               "$(curl -s -X POST "$BASE/api/review/submit/$CID" -H "Authorization: Bearer $TOKEN" | jget "['data']['status']")" "submitted"
+SELF=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/review/approve/$CID" -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" -d '{"decision":"approve","comment":""}')
+check "提交人无权审批 403"     "$SELF" "403"
+APR=$(curl -s -X POST "$BASE/api/review/approve/$CID" -H "Authorization: Bearer $REV" \
+  -H "Content-Type: application/json" -d '{"decision":"approve","comment":"同意补收"}')
+check "复核人审批通过"         "$(echo "$APR" | jget "['data']['status']")" "approved"
+
+echo "== 11. P1 导出留痕 =="
+EXP=$(curl -s -X POST "$BASE/api/export/pack" -H "Authorization: Bearer $REV" \
+  -H "Content-Type: application/json" -d '{"shipment_id":"SO2610-0187","receiver":"宁波恒晟机电 王会计"}')
+check "导出成功"               "$(echo "$EXP" | jget "['ok']")" "True"
+check "导出带审计号"           "$(echo "$EXP" | python -c "import json,sys;print(len(json.load(sys.stdin)['data']['audit_id'])>0)")" "True"
+check "包内无单价字段"         "$(echo "$EXP" | python -c "import json,sys;t=str(json.load(sys.stdin)['data']['pack']).lower();print(not any(k in t for k in ['unit_price','gross_margin','毛利']))")" "True"
+NOR=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/export/pack" -H "Authorization: Bearer $REV" \
+  -H "Content-Type: application/json" -d '{"shipment_id":"SO2610-0187","receiver":""}')
+check "缺接收方被拒 400"       "$NOR" "400"
+AUDIT_HAS=$(curl -s "$BASE/api/audit/tail?n=50" -H "Authorization: Bearer $REV" | python -c "import json,sys;r=json.load(sys.stdin)['data']['records'];print(any(x['action']=='export' and x.get('receiver') for x in r))")
+check "审计里有导出接收方"     "$AUDIT_HAS" "True"
+
 echo
 echo "== 结果：通过 $PASS 项，失败 $FAIL 项 =="
 [ "$FAIL" -eq 0 ] || { echo "详见 $LOG"; exit 1; }

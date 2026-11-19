@@ -23,7 +23,11 @@ from app.core.redline import (  # noqa: E402  导入放 sys.path 之后，保证
     to_decimal,
 )
 from app.core.response import fail, is_ok, ok  # noqa: E402
+from app.core.audit import AuditLog  # noqa: E402
 from app.core.llm import LLMClient  # noqa: E402
+from app.repo import build_demo_repository  # noqa: E402
+from app.services.export import ExportViolation, build_pack, _guard  # noqa: E402
+from app.services.review import ReviewError, ReviewStore  # noqa: E402
 from app.core.security import (  # noqa: E402
     ROLE_OPERATOR,
     ROLE_SETTLER,
@@ -226,6 +230,128 @@ class TestLLM(unittest.TestCase):
         """未支持的 provider 必须在构造时失败，不能静默降级。"""
         with self.assertRaises(ValueError):
             LLMClient("openai-cloud", "", "x")
+
+
+class TestAudit(unittest.TestCase):
+    """审计日志：只追加、带四要素。"""
+
+    def setUp(self):
+        self.path = "data/_test_audit.jsonl"
+        import os
+        if os.path.exists(self.path):
+            os.remove(self.path)
+        self.audit = AuditLog(self.path)
+
+    def tearDown(self):
+        import os
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def test_append_only(self):
+        """两次写入应产生两行，且行数只增不减。"""
+        self.audit.write("a", "settler", "query", "X")
+        self.audit.write("b", "reviewer", "export", "Y", fields=["amount"], receiver="客户")
+        self.assertEqual(len(self.audit.tail()), 2)
+
+    def test_export_records_receiver(self):
+        """导出类记录必须带 receiver，否则无法回答"给谁了"。"""
+        self.audit.write("b", "reviewer", "export", "SO2610-0187", receiver="王会计")
+        rec = self.audit.tail(1)[0]
+        self.assertEqual(rec["receiver"], "王会计")
+        self.assertTrue(rec["audit_id"])
+
+
+class TestReview(unittest.TestCase):
+    """复核闸门：状态机 + 自审拦截。"""
+
+    def setUp(self):
+        import os
+        self.audit_path = "data/_test_audit2.jsonl"
+        self.review_path = "data/_test_review.json"
+        for p in (self.audit_path, self.review_path):
+            if os.path.exists(p):
+                os.remove(p)
+        self.audit = AuditLog(self.audit_path)
+        self.store = ReviewStore(self.review_path)
+
+    def tearDown(self):
+        import os
+        for p in (self.audit_path, self.review_path):
+            if os.path.exists(p):
+                os.remove(p)
+
+    def _draft(self):
+        return self.store.create("SO2610-0187", "chenlili", "settler",
+                                 {"totals": {"CNY": "2,610.00 CNY"}}, self.audit)
+
+    def test_full_flow(self):
+        """草稿 → 提交 → 他人审批通过。"""
+        case = self._draft()
+        self.assertEqual(case["status"], "draft")
+        submitted = self.store.submit(case["case_id"], "chenlili", "settler", self.audit)
+        self.assertEqual(submitted["status"], "submitted")
+        approved = self.store.approve(case["case_id"], "zhouhui", "reviewer",
+                                      "approve", "同意补收", self.audit)
+        self.assertEqual(approved["status"], "approved")
+
+    def test_self_approval_blocked(self):
+        """提交人自己审批必须被拦（制度 §9.4）。"""
+        case = self._draft()
+        self.store.submit(case["case_id"], "chenlili", "settler", self.audit)
+        with self.assertRaises(ReviewError) as ctx:
+            self.store.approve(case["case_id"], "chenlili", "reviewer", "approve", "", self.audit)
+        self.assertEqual(ctx.exception.code, "SELF_APPROVAL")
+
+    def test_non_reviewer_blocked(self):
+        """非复核人不能审批。"""
+        case = self._draft()
+        self.store.submit(case["case_id"], "chenlili", "settler", self.audit)
+        with self.assertRaises(ReviewError):
+            self.store.approve(case["case_id"], "zhangwei", "operator", "approve", "", self.audit)
+
+    def test_reject_requires_comment(self):
+        """驳回必须写意见。"""
+        case = self._draft()
+        self.store.submit(case["case_id"], "chenlili", "settler", self.audit)
+        with self.assertRaises(ReviewError) as ctx:
+            self.store.approve(case["case_id"], "zhouhui", "reviewer", "reject", "", self.audit)
+        self.assertEqual(ctx.exception.code, "COMMENT_REQUIRED")
+
+
+class TestExport(unittest.TestCase):
+    """追溯包：白名单 + 必填接收方。"""
+
+    def setUp(self):
+        import os
+        self.path = "data/_test_audit3.jsonl"
+        if os.path.exists(self.path):
+            os.remove(self.path)
+        self.audit = AuditLog(self.path)
+        self.repo = build_demo_repository()
+
+    def tearDown(self):
+        import os
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def test_pack_has_no_price_field(self):
+        """包内不得出现单价/毛利类字段。"""
+        shipment = self.repo.shipment_by_key("bl_no", "HLCUNB26100457")
+        out = build_pack(self.repo, shipment, "zhouhui", "reviewer", "王会计", self.audit)
+        text = str(out["pack"]).lower()
+        for kw in ("unit_price", "gross_margin", "cost", "毛利"):
+            self.assertNotIn(kw, text)
+
+    def test_receiver_required(self):
+        """不填接收方就导出必须失败。"""
+        shipment = self.repo.shipment_by_key("bl_no", "HLCUNB26100457")
+        with self.assertRaises(ValueError):
+            build_pack(self.repo, shipment, "zhouhui", "reviewer", "  ", self.audit)
+
+    def test_guard_catches_leak(self):
+        """守卫函数必须拦住偷偷塞进去的毛利字段。"""
+        with self.assertRaises(ExportViolation):
+            _guard({"shipment_id": "X", "gross_margin": "8.2%"})
 
 
 if __name__ == "__main__":

@@ -18,12 +18,15 @@ from app.core.config import get_settings
 from app.core.llm import LLMClient
 from app.core.redline import OutboundFilter, RedlineViolation
 from app.core.response import fail, ok
+from app.core.audit import AuditLog
 from app.repo import get_repository
 from app.services.collect import build_view, get_shipment
 from app.services.diff import compute_diff
 from app.services.graph import expand, why_applicable
 from app.services.kb import build_knowledge_provider
 from app.services.rate import RateCardMissing
+from app.services.review import ReviewError, ReviewStore
+from app.services.export import ExportViolation, build_pack
 from app.core.security import (
     TokenError,
     abilities,
@@ -39,6 +42,8 @@ REPO = get_repository()
 
 SETTINGS = get_settings()                                        # 启动即读配置（缺失就崩，见 config.py）
 KB = build_knowledge_provider(SETTINGS)                          # Harness 优先，失败降级本地镜像
+AUDIT = AuditLog("data/audit.jsonl")                             # 只追加审计日志
+REVIEW = ReviewStore("data/review.json")                         # 复核单（P1 文件存储）
 LLM = LLMClient(                                                # 模型客户端：provider=mock 时离线可用
     provider=SETTINGS.get("llm.provider", "mock"),
     base_url=SETTINGS.get("llm.base_url", ""),
@@ -59,6 +64,23 @@ class LoginBody(BaseModel):
 
     username: str
     password: str
+
+
+def require_capability(user: dict, capability: str, action: str, target: str) -> None:
+    """校验角色能力，不通过则记审计并抛 403。
+
+    入参：
+        user —— 当前身份（含 abilities）
+        capability —— view_price / export / approve / view_audit
+        action/target —— 用于审计记录
+    出参：无（通过则静默返回）
+    失败行为：
+        能力不足时**先记审计再抛 HTTPException(403)**——越权尝试本身就是要留痕的事件。
+    """
+    if not user.get("abilities", {}).get(capability, False):
+        AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "denied", target,
+                    result="denied", extra={"need": capability, "action": action})
+        raise HTTPException(status_code=403, detail=f"角色 {user.get('role')} 无 {capability} 权限")
 
 
 def _unauthorized(code: str, msg: str) -> JSONResponse:
@@ -284,7 +306,10 @@ def api_shipment(key_value: str, key_type: str = "booking_no",
     try:
         assert_customer_allowed(user.get("scope", []), shipment.customer_id)   # 数据隔离
     except PermissionError as exc:
+        AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "denied",
+                    shipment.customer_id, result="denied", extra={"reason": "scope"})
         return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
+    AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "query", shipment.shipment_id)
     return JSONResponse(status_code=200, content=ok(build_view(REPO, shipment)))
 
 
@@ -304,8 +329,12 @@ def api_diff(shipment_id: str, user: dict = Depends(current_user)) -> JSONRespon
         assert_customer_allowed(user.get("scope", []), shipment.customer_id)
     except PermissionError as exc:
         return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
+    require_capability(user, "view_price", "diff", shipment.shipment_id)
     try:
-        return JSONResponse(status_code=200, content=ok(compute_diff(REPO, shipment)))
+        data = compute_diff(REPO, shipment)
+        AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "diff", shipment.shipment_id,
+                    extra={"totals": data.get("totals")})
+        return JSONResponse(status_code=200, content=ok(data))
     except RateCardMissing as exc:
         return JSONResponse(status_code=409, content=fail("RATE_CARD_MISSING", str(exc)))
 
@@ -327,6 +356,7 @@ def api_trace(shipment_id: str, fee_code: str,
     except PermissionError as exc:
         return JSONResponse(status_code=403, content=fail("FORBIDDEN", str(exc)))
 
+    require_capability(user, "view_price", "trace", shipment.shipment_id)
     diff = compute_diff(REPO, shipment)
     hit = next((d for d in diff["differences"] if d["fee_code"] == fee_code), None)
     if hit:
@@ -337,6 +367,8 @@ def api_trace(shipment_id: str, fee_code: str,
         levels = [lv.__dict__ for lv in build_trace(
             REPO, shipment, fee_code, diff["rate_card"], "", "", line)]
     breaks = [lv["level"] for lv in levels if lv.get("missing")]
+    AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "trace",
+                f"{shipment.shipment_id}/{fee_code}", extra={"breaks": breaks})
     return JSONResponse(status_code=200, content=ok(
         {"fee_code": fee_code, "levels": levels, "breaks": breaks}))
 
@@ -350,6 +382,8 @@ def api_kb(q: str, top_k: int = 5, user: dict = Depends(current_user)) -> JSONRe
     失败行为：不抛异常；无命中返回空列表并在 provider 中标明后端。
     """
     hits = KB.search(q, top_k)
+    AUDIT.write(user.get("sub", "?"), user.get("role", "?"), "kb", q,
+                extra={"hits": len(hits), "provider": KB.name()})
     return JSONResponse(status_code=200, content=ok({
         "provider": KB.name(),
         "hits": [{"doc_no": h.doc_no, "clause_no": h.clause_no, "title": h.title,
@@ -380,3 +414,137 @@ def api_graph_expand(entity: str, hops: int = 2,
     失败行为：不抛异常。
     """
     return JSONResponse(status_code=200, content=ok(expand(REPO, entity, hops)))
+
+
+# ============================================================================
+# P1 接口：复核闸门 / 导出留痕 / 审计查询
+# 红线 5：系统只产出草稿，没有"发送"接口；审批必须换人（制度 §9.4）
+# ============================================================================
+
+class ReviewDecisionBody(BaseModel):
+    """审批请求体。"""
+
+    decision: str = "approve"      # approve / reject
+    comment: str = ""
+
+
+class ExportBody(BaseModel):
+    """导出请求体。"""
+
+    shipment_id: str
+    receiver: str                 # 接收方，必填（红线 3）
+
+
+@app.post("/api/review/draft/{shipment_id}")
+def api_review_draft(shipment_id: str, user: dict = Depends(current_user)) -> JSONResponse:
+    """生成复核草稿（冻结当前差异快照）。
+
+    入参：shipment_id —— 单票号
+    出参：统一结构，data 为复核单
+    失败行为：查不到单票 404；无 view_price 权限 403；缺费率卡 409。
+    """
+    shipment = get_shipment(REPO, "order_no", shipment_id)
+    if not shipment:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"未找到单票 {shipment_id}"))
+    require_capability(user, "view_price", "review_draft", shipment.shipment_id)
+    try:
+        diff = compute_diff(REPO, shipment)
+    except RateCardMissing as exc:
+        return JSONResponse(status_code=409, content=fail("RATE_CARD_MISSING", str(exc)))
+
+    snapshot = {
+        "rate_card": diff["rate_card"],
+        "totals": diff["totals"],
+        "difference_count": len(diff["differences"]),
+        "missing": [d["fee_code"] for d in diff["differences"] if d["kind"] == "缺项"],
+    }
+    case = REVIEW.create(shipment.shipment_id, user.get("sub", "?"), user.get("role", "?"),
+                         snapshot, AUDIT)
+    return JSONResponse(status_code=200, content=ok(case))
+
+
+@app.post("/api/review/submit/{case_id}")
+def api_review_submit(case_id: str, user: dict = Depends(current_user)) -> JSONResponse:
+    """提交复核（草稿 → 待审）。
+
+    入参：case_id —— 复核单号
+    出参：统一结构，data 为更新后的复核单
+    失败行为：非本人草稿 / 状态不符返回 409；不存在 404。
+    """
+    try:
+        return JSONResponse(status_code=200,
+                            content=ok(REVIEW.submit(case_id, user.get("sub", "?"),
+                                                     user.get("role", "?"), AUDIT)))
+    except ReviewError as exc:
+        code = 404 if exc.code == "NOT_FOUND" else 409
+        return JSONResponse(status_code=code, content=fail(exc.code, str(exc)))
+
+
+@app.post("/api/review/approve/{case_id}")
+def api_review_approve(case_id: str, body: ReviewDecisionBody,
+                      user: dict = Depends(current_user)) -> JSONResponse:
+    """审批（通过 / 驳回）。
+
+    入参：case_id；body.decision（approve/reject）；body.comment
+    出参：统一结构，data 为更新后的复核单
+    失败行为：
+        非复核人 403；提交人自审 409（SELF_APPROVAL）；驳回无意见 409。
+    """
+    require_capability(user, "approve", "review_approve", case_id)
+    try:
+        return JSONResponse(status_code=200,
+                            content=ok(REVIEW.approve(case_id, user.get("sub", "?"),
+                                                      user.get("role", "?"), body.decision,
+                                                      body.comment, AUDIT)))
+    except ReviewError as exc:
+        code = 404 if exc.code == "NOT_FOUND" else (403 if exc.code == "FORBIDDEN" else 409)
+        return JSONResponse(status_code=code, content=fail(exc.code, str(exc)))
+
+
+@app.get("/api/review/{case_id}")
+def api_review_get(case_id: str, user: dict = Depends(current_user)) -> JSONResponse:
+    """查看复核单。
+
+    入参：case_id
+    出参：统一结构，data 为复核单
+    失败行为：不存在 404。
+    """
+    case = REVIEW.get(case_id)
+    if not case:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"复核单不存在：{case_id}"))
+    return JSONResponse(status_code=200, content=ok(case))
+
+
+@app.post("/api/export/pack")
+def api_export_pack(body: ExportBody, user: dict = Depends(current_user)) -> JSONResponse:
+    """导出客户追溯包（字段白名单 + 强制留痕）。
+
+    入参：body.shipment_id；body.receiver（必填）
+    出参：统一结构，data = {"pack":..., "audit_id":..., "fields":[...]}
+    失败行为：
+        无 export 权限 403；receiver 为空 400；包内出现敏感字段 500（属代码缺陷）。
+    """
+    require_capability(user, "export", "export", body.shipment_id)
+    shipment = get_shipment(REPO, "order_no", body.shipment_id)
+    if not shipment:
+        return JSONResponse(status_code=404, content=fail("NOT_FOUND", f"未找到单票 {body.shipment_id}"))
+    try:
+        out = build_pack(REPO, shipment, user.get("sub", "?"), user.get("role", "?"),
+                         body.receiver, AUDIT)
+        return JSONResponse(status_code=200, content=ok(out))
+    except ValueError as exc:
+        return JSONResponse(status_code=400, content=fail("BAD_REQUEST", str(exc)))
+    except ExportViolation as exc:                    # 代码缺陷：必须暴露而不是静默截断
+        return JSONResponse(status_code=500, content=fail("EXPORT_VIOLATION", str(exc)))
+
+
+@app.get("/api/audit/tail")
+def api_audit_tail(n: int = 20, user: dict = Depends(current_user)) -> JSONResponse:
+    """查看最近审计记录（合规/审计只读能力）。
+
+    入参：n —— 条数
+    出参：统一结构，data = {"records":[...]}
+    失败行为：无 view_audit 权限 403。
+    """
+    require_capability(user, "view_audit", "audit_tail", "audit")
+    return JSONResponse(status_code=200, content=ok({"records": AUDIT.tail(n)}))
