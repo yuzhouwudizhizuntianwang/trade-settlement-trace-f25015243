@@ -117,7 +117,30 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 6. 交付物索引
+## 6. 开源实践（向第三方仓库提交 Issue 与 PR）
+
+按实训要求，向**他人开源项目**提交了一个 Issue 与一个 Pull Request，均已真实提交、可点开核验：
+
+| 类型 | 编号 | 链接 | 状态 |
+|---|---|---|---|
+| Issue | **#7** | https://github.com/Euzohn/ZFundPilot/issues/7 | open |
+| Pull Request | **#8** | https://github.com/Euzohn/ZFundPilot/pull/8 | open，mergeable，1 file +9 −1 |
+
+**目标仓库**：`Euzohn/ZFundPilot`（Python + FastAPI，MIT，★32）—— 所有者 `Euzohn`，**非本人仓库**。
+**提交账号**：`yuzhouwudizhizuntianwang` ｜ **提交时间**：2026-11-19 10:22 UTC
+
+**Issue #7**：指出 `CONTRIBUTING.md` 的启动命令 `PYTHONPATH=src uvicorn ...` 是 POSIX 语法，Windows 下会报错，且与 README 写法不一致。
+**PR #8**：修复该问题——去掉 `PYTHONPATH` 前缀并补 Windows 写法，仅动 `CONTRIBUTING.md` 一个代码块（+9 −1）。
+
+| Pull Request #8 | Issue #7 |
+|---|---|
+| ![PR #8](docs/assets/oss-contrib/pr-8.png) | ![Issue #7](docs/assets/oss-contrib/issue-7.png) |
+
+> 详细说明与核验方式见 [`docs/开源实践.md`](docs/开源实践.md)；图片为 GitHub 官方页面预览图。
+
+---
+
+## 7. 交付物索引
 
 | 阶段 | 任务 | 交付物 | 过程件 | 成品报告（`docs/`） |
 |---|---|---|---|---|
@@ -137,7 +160,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 7. 核心指标：基线 → 目标
+## 8. 核心指标：基线 → 目标
 
 | 指标 | 口径（起点→终点） | 基线（2026 Q3） | 目标 | 数据来源 |
 |---|---|---|---|---|
@@ -152,7 +175,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 8. 编号约定（跨文档唯一）
+## 9. 编号约定（跨文档唯一）
 
 | 前缀 | 含义 | 示例 | 维护位置 |
 |---|---|---|---|
@@ -167,7 +190,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 9. 怎么读这个仓库
+## 10. 怎么读这个仓库
 
 1. 只想看结论 → `docs/00-overview.md`（含四来源收敛结论与 7 项待核实）
 2. 要评审阶段 01 → `docs/01_业务挖掘报告_*.md` + `docs/09-stage-gates.md`
@@ -176,7 +199,7 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 10. 边界声明
+## 11. 边界声明
 
 - 本项目 **不含** 真实客户数据。所有企业名、人名、金额、单号均为实训场景构造，口径与方法遵循真实 FDE 流程。
 - `docs/` 中所有"原话"来自实训角色访谈记录，金额与单号已做脱敏替换。
@@ -184,6 +207,6 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ---
 
-## 11. License
+## 12. License
 
 MIT © 2026 海川服贸 FDE 实训小组
