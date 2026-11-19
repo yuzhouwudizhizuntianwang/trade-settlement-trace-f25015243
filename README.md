@@ -99,6 +99,11 @@ trade-settlement-trace/                     ← GitHub: trade-settlement-trace-f
 
 ## 5. 智能体系统交付物（结算复核助手）
 
+> **在线演示**：https://settlement-copilot.app.workbuddy.host/?sharecode=PFO3BIQLO2
+> 演示账号 `chenlili / Demo#2026`（结算专员）、`zhouhui / Demo#2026`（复核人）、`zhangwei / Demo#2026`（单证，金额打码）
+> 输入 `BK2610-0187` 即可复现 ¥2,610 漏收与四级追溯链。
+
+
 | 文件 | 内容 | 状态 |
 |---|---|---|
 | `docs/技术方案.md` / `.docx` | 架构、选型理由、数据模型、**知识图谱 Schema**、红线实现、接口清单、里程碑 | ✅ |
